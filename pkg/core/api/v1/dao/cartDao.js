@@ -1,4 +1,23 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -11,6 +30,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CartDao = void 0;
 const baseDao_1 = require("../../../DAO/baseDao");
+const uuid = __importStar(require("uuid"));
 class CartDao extends baseDao_1.BaseDao {
     constructor() {
         super();
@@ -42,7 +62,7 @@ class CartDao extends baseDao_1.BaseDao {
                         };
                         data.push(newCart);
                     }
-                    callback(data);
+                    callback(JSON.stringify(data));
                 });
             }
             return yield execQuery();
@@ -59,6 +79,30 @@ class CartDao extends baseDao_1.BaseDao {
             // noinspection DuplicatedCode
             client.end();
             callback(list[0]);
+        });
+    }
+    getCartNoFromMemberNo(callback, memberNo) {
+        const q = `SELECT * FROM "Cart" WHERE member_no = $1`;
+        var client = this.getClient();
+        client.query(q, [memberNo], (err, result) => {
+            if (err) {
+                console.log("Can't exec query!" + err);
+                return err;
+            }
+            if (result.rows.length == 0) {
+                console.log("There is no Cart! creating new one....", memberNo);
+                let cart = {
+                    cart_no: uuid.v4(),
+                    member_no: memberNo,
+                    createdDate: "",
+                };
+                this.insertNewCart(cart);
+                callback(cart.cart_no);
+            }
+            else {
+                callback(result.rows[0]);
+            }
+            client.end();
         });
     }
     selectCartDetailFromNo(callback, no) {
@@ -85,9 +129,10 @@ class CartDao extends baseDao_1.BaseDao {
         });
     }
     insertNewCart(cart) {
-        const q = `INSERT INTO "Cart"(cart_no, member_no, createdDate) values ($1, $2, $3)`;
+        const q = `INSERT INTO "Cart"(cart_no, member_no, create_date) values ($1, $2, NOW())`;
+        console.log("InsertNewCart , ", cart);
         var client = this.getClient();
-        client.query(q, [cart.cart_no, cart.member_no, cart.createdDate], (err, result) => {
+        client.query(q, [cart.cart_no, cart.member_no], (err, result) => {
             if (err) {
                 console.log("Can't exec query!" + err);
             }

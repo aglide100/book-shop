@@ -1,5 +1,3 @@
-GRANT ALL PRIVILEGES ON DATABASE book_shop TO table_admin;
-
 create table if not exists "Member"
 (
     member_no varchar not null
@@ -65,8 +63,8 @@ create table if not exists "Book"
     book_no  varchar not null
         constraint book_pk
             primary key,
-    title     varchar not null,
-    author     varchar not null,
+    title    varchar not null,
+    author   varchar not null,
     quantity integer not null,
     price    integer not null
 );
@@ -84,7 +82,7 @@ create table if not exists "Cart"
     cart_no     varchar not null
         constraint cart_pk
             primary key,
-    create_date date    not null,
+    create_date varchar not null,
     member_no   varchar
         constraint member_no
             references "Member"
@@ -124,12 +122,12 @@ create unique index if not exists creditcard_card_number_uindex
 create table if not exists "Cart_Book"
 (
     book_no       varchar not null
+        constraint cart_book_pk
+            primary key
         constraint book_no
             references "Book"
             on update cascade on delete cascade,
     cart_no       varchar not null
-        constraint cart_book_pk
-            primary key
         constraint cart_no
             references "Cart"
             on update cascade on delete cascade,
@@ -152,6 +150,6 @@ create table if not exists "Order_detail"
     order_price    integer not null
 );
 
-alter table "Order_Book"
+alter table "Order_detail"
     owner to table_admin;
 

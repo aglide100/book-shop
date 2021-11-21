@@ -81,13 +81,17 @@ export class OrderDao extends BaseDao {
     });
   }
 
-  public async insertOrderFromCart(order: OrderProps, books: OrderDetailProps[], cart_no : string | null) {
+  public async insertOrderFromCart(
+    order: OrderProps,
+    books: OrderDetailProps[],
+    cart_no: string | null
+  ) {
     var result = false;
     const client = this.getClient();
     try {
-      await client.query('BEGIN')
+      await client.query("BEGIN");
 
-      const orderQ = `INSERT INTO "Order"(order_no, orderdate, price, member_no, credit_number, credit_kind, credit_expiredate, address_zipcode, address_address1, address_address2) values ($1, NOW(), $2, $3, $4, $5, $6, $7, $8, $9, $10)`;
+      const orderQ = `INSERT INTO "Order"(order_no, order_date, price, member_no, credit_number, credit_kind, credit_expiredate, address_zipcode, address_address1, address_address2) values ($1, NOW(), $2, $3, $4, $5, $6, $7, $8, $9, $10)`;
       const res = await client.query(orderQ, [
         order.order_no,
         order.price,
@@ -107,22 +111,22 @@ export class OrderDao extends BaseDao {
           books[i].book_no,
           books[i].order_quantity,
           books[i].order_price,
-        ])
+        ]);
 
         const bookMiuns = `UPDATE "Book" SET quantity = quantity-1 where book_no = $1`;
-        await client.query(bookMiuns, [books[i].book_no])
+        await client.query(bookMiuns, [books[i].book_no]);
       }
 
       if (cart_no != null) {
         const deleteQ = `DELETE FROM "Cart" WHERE cart_no = $1`;
-        await client.query(deleteQ, [cart_no])
+        await client.query(deleteQ, [cart_no]);
       }
 
-      await client.query('COMMIT')
+      await client.query("COMMIT");
       result = true;
     } catch (e) {
-      await client.query('ROLLBACK')
-      throw e
+      await client.query("ROLLBACK");
+      throw e;
     } finally {
       await client.end();
     }

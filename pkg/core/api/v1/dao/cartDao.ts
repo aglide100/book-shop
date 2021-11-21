@@ -1,6 +1,8 @@
 import { BaseDao } from "../../../DAO/baseDao";
 import { CartProps } from "../common/CartProps";
-import {CartBookProps} from "../common/CartBookProps";
+import { CartBookProps } from "../common/CartBookProps";
+import * as uuid from "uuid";
+
 export class CartDao extends BaseDao {
   private static instance: CartDao;
 
@@ -42,7 +44,7 @@ export class CartDao extends BaseDao {
           data.push(newCart);
         }
 
-        callback(data);
+        callback(JSON.stringify(data));
       });
     }
 
@@ -63,6 +65,34 @@ export class CartDao extends BaseDao {
       client.end();
 
       callback(list[0]);
+    });
+  }
+
+  public getCartNoFromMemberNo(callback: Function, memberNo: string) {
+    const q = `SELECT * FROM "Cart" WHERE member_no = $1`;
+    var client = this.getClient();
+
+    client.query(q, [memberNo], (err, result) => {
+      if (err) {
+        console.log("Can't exec query!" + err);
+        return err;
+      }
+
+      if (result.rows.length == 0) {
+        console.log("There is no Cart! creating new one....", memberNo);
+
+        let cart: CartProps = {
+          cart_no: uuid.v4(),
+          member_no: memberNo,
+          createdDate: "",
+        };
+        this.insertNewCart(cart);
+        callback(cart.cart_no);
+      } else {
+        callback(result.rows[0]);
+      }
+
+      client.end();
     });
   }
 
@@ -96,23 +126,20 @@ export class CartDao extends BaseDao {
   }
 
   public insertNewCart(cart: CartProps) {
-    const q = `INSERT INTO "Cart"(cart_no, member_no, createdDate) values ($1, $2, $3)`;
+    const q = `INSERT INTO "Cart"(cart_no, member_no, create_date) values ($1, $2, NOW())`;
 
+    console.log("InsertNewCart , ", cart);
     var client = this.getClient();
 
-    client.query(
-      q,
-      [cart.cart_no, cart.member_no, cart.createdDate],
-      (err, result) => {
-        if (err) {
-          console.log("Can't exec query!" + err);
-        }
-
-        console.log(result);
-
-        client.end();
+    client.query(q, [cart.cart_no, cart.member_no], (err, result) => {
+      if (err) {
+        console.log("Can't exec query!" + err);
       }
-    );
+
+      console.log(result);
+
+      client.end();
+    });
   }
 
   public deleteCart(id: string) {

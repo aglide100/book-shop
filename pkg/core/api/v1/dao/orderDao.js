@@ -79,8 +79,8 @@ class OrderDao extends baseDao_1.BaseDao {
             var result = false;
             const client = this.getClient();
             try {
-                yield client.query('BEGIN');
-                const orderQ = `INSERT INTO "Order"(order_no, orderdate, price, member_no, credit_number, credit_kind, credit_expiredate, address_zipcode, address_address1, address_address2) values ($1, NOW(), $2, $3, $4, $5, $6, $7, $8, $9, $10)`;
+                yield client.query("BEGIN");
+                const orderQ = `INSERT INTO "Order"(order_no, order_date, price, member_no, credit_number, credit_kind, credit_expiredate, address_zipcode, address_address1, address_address2) values ($1, NOW(), $2, $3, $4, $5, $6, $7, $8, $9, $10)`;
                 const res = yield client.query(orderQ, [
                     order.order_no,
                     order.price,
@@ -107,11 +107,11 @@ class OrderDao extends baseDao_1.BaseDao {
                     const deleteQ = `DELETE FROM "Cart" WHERE cart_no = $1`;
                     yield client.query(deleteQ, [cart_no]);
                 }
-                yield client.query('COMMIT');
+                yield client.query("COMMIT");
                 result = true;
             }
             catch (e) {
-                yield client.query('ROLLBACK');
+                yield client.query("ROLLBACK");
                 throw e;
             }
             finally {

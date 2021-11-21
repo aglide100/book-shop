@@ -46,7 +46,11 @@ export default function Layout({
             }}
           >
             로그아웃
-          </span>
+          </span>{" "}
+          |{" "}
+          <Link href="/cart">
+            <a>장바구니</a>
+          </Link>
         </>
       );
     }

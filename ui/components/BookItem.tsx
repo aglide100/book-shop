@@ -85,7 +85,7 @@ export const BookItem = (props: BookProps) => {
                 setIsSelected(!isSelected);
               }}
             >
-              <p>도서제목 : {props.title}</p>
+              <p>{props.title}</p>
             </div>
           </>
         )}
@@ -148,6 +148,7 @@ export const BookItem = (props: BookProps) => {
                 </div>
 
                 <div className="w-96 flex flex-col justify-around mt-5">
+                  {/* <div className="mb-1">도서 주요키 : {props.id}</div> */}
                   <div className="mb-1">도서 제목 : {props.title}</div>
                   <div className="mb-1">도서 저자: {props.author}</div>
                   <div className="mb-1">도서 가격: {props.price}</div>
@@ -188,17 +189,23 @@ export const BookItem = (props: BookProps) => {
                         const axiosObj = axios.default;
 
                         const data = JSON.stringify({
-                          member_no: getCookie("user"),
-                          bookId: props.id,
-                          quantity: quantity,
+                          memberNo: getCookie("member_no"),
+                          bookNo: props.id,
+                          cartQuantity: quantity,
+                          // 할인율
+                          cartPrice: props.price * quantity,
                         });
 
                         axiosObj
-                          .post("http://localhost:4000/api/v1/cart/", data, {
-                            headers: {
-                              "Content-Type": "application/json",
-                            },
-                          })
+                          .post(
+                            "http://localhost:4000/api/v1/cartDetail/",
+                            data,
+                            {
+                              headers: {
+                                "Content-Type": "application/json",
+                              },
+                            }
+                          )
                           .then((response) => {});
                       }}
                     >

@@ -4,6 +4,7 @@ import { BookController } from "../../pkg/core/api/v1/controller/bookController"
 import { MemberController } from "../../pkg/core/api/v1/controller/memberController";
 import { CartController } from "../../pkg/core/api/v1/controller/cartController";
 import { OrderController } from "../../pkg/core/api/v1/controller/orderController";
+import { CartDetailController } from "../../pkg/core/api/v1/controller/cartDetailController";
 
 // import * as swaggerUi from "swagger-ui-express";
 // import * as swaggerJsDoc from "swagger-jsdoc";
@@ -38,6 +39,7 @@ const BookCtrl = new BookController();
 const MemberCtrl = new MemberController();
 const CartCtrl = new CartController();
 const OrderCtrl = new OrderController();
+const CartDetailCtrl = new CartDetailController();
 
 const cors = require("cors");
 app.use(cors());
@@ -112,7 +114,7 @@ if (apiVersion == "v1") {
     "GET",
     "get cart",
     "Cart",
-    CartCtrl.getAllCart
+    CartCtrl.getAllCart()
   );
 
   server.addRule(
@@ -154,6 +156,40 @@ if (apiVersion == "v1") {
     "Order",
     OrderCtrl.getOrderDetail()
   );
+
+  server.addRule(
+    apiVersion + "/cartDetail",
+    "POST",
+    "insert new Cart_Book",
+    "Cart_Book",
+    CartDetailCtrl.createNewCartDetail()
+  );
+
+  server.addRule(
+    apiVersion + "/cartDetail/:CartNo/:BookNo",
+    "DELETE",
+    "Delete new Cart_Book",
+    "Cart_Book",
+    CartDetailCtrl.deleteCartDetail()
+  );
+
+  server.addRule(
+    apiVersion + "/cartDetail/:CartNo",
+    "GET",
+    "GET Cart_Book list",
+    "Cart_Book",
+    CartDetailCtrl.getAllCartDetailFromCartNo()
+  );
+
+  server.addRule(
+    apiVersion + "/cartDetail/update/:CartNo",
+    "POST",
+    "GET Cart_Book list",
+    "Cart_Book",
+    CartDetailCtrl.updateCartDetail()
+  );
+
+  // server.addRule()
 }
 
 server.listen(port);

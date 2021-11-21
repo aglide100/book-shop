@@ -9,6 +9,7 @@ const bookController_1 = require("../../pkg/core/api/v1/controller/bookControlle
 const memberController_1 = require("../../pkg/core/api/v1/controller/memberController");
 const cartController_1 = require("../../pkg/core/api/v1/controller/cartController");
 const orderController_1 = require("../../pkg/core/api/v1/controller/orderController");
+const cartDetailController_1 = require("../../pkg/core/api/v1/controller/cartDetailController");
 // import * as swaggerUi from "swagger-ui-express";
 // import * as swaggerJsDoc from "swagger-jsdoc";
 // const options = {
@@ -38,6 +39,7 @@ const BookCtrl = new bookController_1.BookController();
 const MemberCtrl = new memberController_1.MemberController();
 const CartCtrl = new cartController_1.CartController();
 const OrderCtrl = new orderController_1.OrderController();
+const CartDetailCtrl = new cartDetailController_1.CartDetailController();
 const cors = require("cors");
 app.use(cors());
 if (apiVersion == "v1") {
@@ -49,11 +51,16 @@ if (apiVersion == "v1") {
     server.addRule(apiVersion + "/member/list", "GET", "member list", "Member list", MemberCtrl.list());
     server.addRule(apiVersion + "/member/join", "POST", "member join", "Member Join", MemberCtrl.join());
     server.addRule(apiVersion + "/member/login", "POST", "login member", "Member", MemberCtrl.login());
-    server.addRule(apiVersion + "/cart/:MemberId", "GET", "get cart", "Cart", CartCtrl.getAllCart);
+    server.addRule(apiVersion + "/cart/:MemberId", "GET", "get cart", "Cart", CartCtrl.getAllCart());
     server.addRule(apiVersion + "/cart", "POST", "create cart", "Cart", CartCtrl.createNewCart());
     server.addRule(apiVersion + "/cart/:CartId", "DELETE", "delete cart", "Cart", CartCtrl.deleteCart());
     server.addRule(apiVersion + "/order", "POST", "insert Order", "Order", OrderCtrl.createNewOrder());
     server.addRule(apiVersion + "/order", "GET", "insert Order", "Order", OrderCtrl.getAllOrder());
     server.addRule(apiVersion + "/order/:OrderId", "GET", "insert Order", "Order", OrderCtrl.getOrderDetail());
+    server.addRule(apiVersion + "/cartDetail", "POST", "insert new Cart_Book", "Cart_Book", CartDetailCtrl.createNewCartDetail());
+    server.addRule(apiVersion + "/cartDetail/:CartNo/:BookNo", "DELETE", "Delete new Cart_Book", "Cart_Book", CartDetailCtrl.deleteCartDetail());
+    server.addRule(apiVersion + "/cartDetail/:CartNo", "GET", "GET Cart_Book list", "Cart_Book", CartDetailCtrl.getAllCartDetailFromCartNo());
+    server.addRule(apiVersion + "/cartDetail/update/:CartNo", "POST", "GET Cart_Book list", "Cart_Book", CartDetailCtrl.updateCartDetail());
+    // server.addRule()
 }
 server.listen(port);

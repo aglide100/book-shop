@@ -7,8 +7,8 @@ import { CartProps } from "../common/CartProps";
 import { OrderProps } from "../common/OrderProps";
 import { CartBookProps } from "../common/CartBookProps";
 import { OrderDetailProps } from "../common/OrderDetailProps";
-import {BookDao} from "../dao/bookDao";
-import {BookProps} from "../common/BookProps";
+import { BookDao } from "../dao/bookDao";
+import { BookProps } from "../common/BookProps";
 
 export class OrderController extends BaseController {
   constructor() {
@@ -67,7 +67,11 @@ export class OrderController extends BaseController {
                   address_address2: req.params.address_address2,
                 };
 
-                const result = OrderDao.getInstance().insertOrderFromCart(newOrder,newBooks, cart.cart_no);
+                const result = OrderDao.getInstance().insertOrderFromCart(
+                  newOrder,
+                  newBooks,
+                  cart.cart_no
+                );
                 console.log("insert Order : " + result);
               } else {
                 // 북정보 없을때
@@ -84,37 +88,41 @@ export class OrderController extends BaseController {
 
   public createNewOrderFromBook(): Handler {
     return (req: Request, res: Response) => {
-      BookDao.getInstance().selectBook( (book : BookProps) => {
-          if (book != null) {
-            const count = Number(req.params.order_quantity);
-            const totalPrice = count * book.price;
-            const id = uuid.v4();
-            const newBooks = Array();
-            let tempBooks: OrderDetailProps = {
-              order_no: id,
-              book_no: book.id,
-              order_quantity: count,
-              order_price: totalPrice,
-            };
-            newBooks.push(tempBooks);
+      BookDao.getInstance().selectBook((book: BookProps) => {
+        if (book != null) {
+          const count = Number(req.params.order_quantity);
+          const totalPrice = count * book.price;
+          const id = uuid.v4();
+          const newBooks = Array();
+          let tempBooks: OrderDetailProps = {
+            order_no: id,
+            book_no: book.id,
+            order_quantity: count,
+            order_price: totalPrice,
+          };
+          newBooks.push(tempBooks);
 
-            let newOrder: OrderProps = {
-              order_no: id,
-              orderdate: "",
-              price: totalPrice,
-              member_no: req.params.member_no,
-              credit_number: req.params.credit_number,
-              credit_kind: req.params.credit_kind,
-              credit_expiredate: req.params.credit_expiredate,
-              address_zipcode: req.params.address_zipcode,
-              address_address1: req.params.address_address1,
-              address_address2: req.params.address_address2,
-            };
+          let newOrder: OrderProps = {
+            order_no: id,
+            orderdate: "",
+            price: totalPrice,
+            member_no: req.params.member_no,
+            credit_number: req.params.credit_number,
+            credit_kind: req.params.credit_kind,
+            credit_expiredate: req.params.credit_expiredate,
+            address_zipcode: req.params.address_zipcode,
+            address_address1: req.params.address_address1,
+            address_address2: req.params.address_address2,
+          };
 
-            const result = OrderDao.getInstance().insertOrderFromCart(newOrder,newBooks, null);
-            console.log("insert Order : " + result);
-          }
-      }, req.params.book_no)
+          const result = OrderDao.getInstance().insertOrderFromCart(
+            newOrder,
+            newBooks,
+            null
+          );
+          console.log("insert Order : " + result);
+        }
+      }, req.params.book_no);
     };
   }
 }

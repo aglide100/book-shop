@@ -142,92 +142,96 @@ const CreatePage: React.FC<{}> = ({}) => {
   };
 
   return (
-    <div>
-      Hello👋
-      <div className="flex flex-col justify-around">
-        <div className="mt-3">
-          <InputField
-            type="text"
-            name="title"
-            placeholder="책 제목을 입력주세요!"
-            label="책 제목"
-            isAutocomplete={false}
-            validationErrorMsg={bookTitleErrorMsg}
-            isInvalid={bookTitleInvalid}
-            onChange={(bookTitle) => {
-              const { isInvalid, errorMessage } = onBookTitleHandle(bookTitle);
-              setBookTitle(bookTitle);
-              setBookTitleErrorMsg(errorMessage);
-              setBookTitleInvalid(isInvalid);
-            }}
-          ></InputField>
-        </div>
-        <div className="mt-3">
-          <InputField
-            type="text"
-            name="author"
-            placeholder="저자을 입력주세요!"
-            label="저자"
-            isAutocomplete={false}
-            validationErrorMsg={bookAuthorErrorMsg}
-            isInvalid={bookAuthorInvalid}
-            onChange={(bookAuthor) => {
-              const { isInvalid, errorMessage } =
-                onBookAuthorHandle(bookAuthor);
-              setBookAuthor(bookAuthor);
-              setBookAuthorErrorMsg(errorMessage);
-              setBookAuthorInvalid(isInvalid);
-            }}
-          ></InputField>
-        </div>
-        <div className="mt-3">
-          <InputField
-            type="number"
-            name="price"
-            placeholder="가격을 입력주세요!"
-            label="가격"
-            isAutocomplete={false}
-            validationErrorMsg=""
-            isInvalid={false}
-            onChange={(bookPrice) => {
-              const { isInvalid, errorMessage } = onBookPriceHandle(bookPrice);
-              setBookPrice(parseInt(bookPrice));
-              setBookPriceErrorMsg(errorMessage);
-              setBookPriceInvalid(isInvalid);
-            }}
-          ></InputField>
-        </div>
+    <div className="py-5">
+      <span className="mt-10 ml-5 text-2xl">도서 정보 입력</span>
+      <div className="flex flex-row justify-center">
+        <div className="flex flex-col justify-around">
+          <div className="mt-3">
+            <InputField
+              type="text"
+              name="title"
+              placeholder="책 제목을 입력주세요!"
+              label="책 제목"
+              isAutocomplete={false}
+              validationErrorMsg={bookTitleErrorMsg}
+              isInvalid={bookTitleInvalid}
+              onChange={(bookTitle) => {
+                const { isInvalid, errorMessage } =
+                  onBookTitleHandle(bookTitle);
+                setBookTitle(bookTitle);
+                setBookTitleErrorMsg(errorMessage);
+                setBookTitleInvalid(isInvalid);
+              }}
+            ></InputField>
+          </div>
+          <div className="mt-3">
+            <InputField
+              type="text"
+              name="author"
+              placeholder="저자을 입력주세요!"
+              label="저자"
+              isAutocomplete={false}
+              validationErrorMsg={bookAuthorErrorMsg}
+              isInvalid={bookAuthorInvalid}
+              onChange={(bookAuthor) => {
+                const { isInvalid, errorMessage } =
+                  onBookAuthorHandle(bookAuthor);
+                setBookAuthor(bookAuthor);
+                setBookAuthorErrorMsg(errorMessage);
+                setBookAuthorInvalid(isInvalid);
+              }}
+            ></InputField>
+          </div>
+          <div className="mt-3">
+            <InputField
+              type="number"
+              name="price"
+              placeholder="가격을 입력주세요!"
+              label="가격"
+              isAutocomplete={false}
+              validationErrorMsg=""
+              isInvalid={false}
+              onChange={(bookPrice) => {
+                const { isInvalid, errorMessage } =
+                  onBookPriceHandle(bookPrice);
+                setBookPrice(parseInt(bookPrice));
+                setBookPriceErrorMsg(errorMessage);
+                setBookPriceInvalid(isInvalid);
+              }}
+            ></InputField>
+          </div>
 
-        <div className="mt-3">
-          <InputField
-            type="number"
-            name="quantity"
-            placeholder="재고량을 입력주세요!"
-            label="재고량"
-            isAutocomplete={false}
-            validationErrorMsg=""
-            isInvalid={false}
-            onChange={(bookQuantity) => {
-              const { isInvalid, errorMessage } =
-                onBookQuantityHandle(bookQuantity);
-              setBookQuantity(parseInt(bookQuantity));
-              setBookQuantityErrorMsg(errorMessage);
-              setBookQuantityInvalid(isInvalid);
-            }}
-          ></InputField>
-        </div>
+          <div className="mt-3">
+            <InputField
+              type="number"
+              name="quantity"
+              placeholder="재고량을 입력주세요!"
+              label="재고량"
+              isAutocomplete={false}
+              validationErrorMsg=""
+              isInvalid={false}
+              onChange={(bookQuantity) => {
+                const { isInvalid, errorMessage } =
+                  onBookQuantityHandle(bookQuantity);
+                setBookQuantity(parseInt(bookQuantity));
+                setBookQuantityErrorMsg(errorMessage);
+                setBookQuantityInvalid(isInvalid);
+              }}
+            ></InputField>
+          </div>
 
-        <Button
-          size="medium"
-          type="button"
-          color="white"
-          isDisabled={!isItValidForm()}
-          onClick={(e) => {
-            onSubmitHandle(e);
-          }}
-        >
-          Submit
-        </Button>
+          <Button
+            size="medium"
+            type="button"
+            color="white"
+            isDisabled={!isItValidForm()}
+            onClick={(e) => {
+              onSubmitHandle(e);
+            }}
+          >
+            Submit
+          </Button>
+        </div>
       </div>
     </div>
   );

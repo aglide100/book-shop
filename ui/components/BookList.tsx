@@ -62,9 +62,10 @@ const BookList = () => {
     <>
       <AnimateSharedLayout>
         <div>
-          검색{" "}
+          <span>검색 </span>
           <input
             type="text"
+            className="w-80"
             placeholder="검색할 제목을 입력해주세요."
             value={searchKeyWord}
             onChange={(e) => {

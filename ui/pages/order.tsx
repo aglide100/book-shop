@@ -1,220 +1,289 @@
-import React, { ReactElement, useState } from "react";
-import { BookProps } from "../components/BookItem";
+import React, { useState, useEffect, ReactElement } from "react";
 import { Button } from "../components/Button";
-import { useRouter } from "next/router";
+import { BookProps } from "../components/BookItem";
+import { InputField, ValidationResult } from "../components/InputField";
 import * as axios from "axios";
-import { useEffect } from "react";
+import { useRouter } from "next/router";
+import { getCookie, setCookie } from "../utils/cookie";
 
-export type OrderProps = {
+export type CartProps = {
   book: BookProps;
   quantity: number;
 };
 
-type BookListProps = {
-  books: OrderProps[];
-  onListChange: (args: BookListItemProps[]) => void;
-};
-
-type BookListItemProps = OrderProps & {
-  onQuantityChange?(value: number): void;
-};
-
-const BookItem = (props: BookListItemProps) => {
-  let value = props.quantity;
-  return (
-    <div>
-      <div className="flex flex-row w-screen justify-around">
-        <div>도서 제목: {props.book.title}</div>
-        <div>도서 저자: {props.book.author}</div>
-        <div>도서 가격: {props.book.price}</div>
-        <div>
-          수량:{" "}
-          <input
-            type="number"
-            placeholder="수량"
-            value={value}
-            onChange={(ev) => {
-              props.onQuantityChange(parseInt(ev.target.value));
-            }}
-          ></input>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export const BookList = (props: BookListProps) => {
-  const [argList, setArgList] = useState<BookListItemProps[]>(props.books);
-  let totalPrice = 0;
-  const onQuantityChange = (id: string, value: number): void => {
-    const newArgList = argList.map((arg) => {
-      if (arg.book.id == id) {
-        return { ...arg, quantity: value };
-      }
-      return arg;
-    });
-    setArgList(newArgList);
-    props.onListChange(newArgList);
-  };
-
-  const argumentList = argList.map((arg, index) => {
-    totalPrice += arg.book.price * arg.quantity;
-    return (
-      <li key={arg.book.id + index}>
-        <BookItem
-          book={arg.book}
-          quantity={arg.quantity}
-          onQuantityChange={(value) => {
-            onQuantityChange(arg.book.id, value);
-          }}
-        ></BookItem>
-      </li>
-    );
-  });
-
-  return (
-    <>
-      <ul>{argumentList.length == 0 ? <></> : argumentList}</ul>
-      <div>주문 총액: {totalPrice}</div>
-    </>
-  );
+type CartDetailProps = {
+  cart_no: string;
+  book_no: string;
+  cart_qunaity: number;
+  cart_price: number;
 };
 
 export const OrderPage: React.FC<{}> = () => {
-  const router = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [isValidForm, setIsValidForm] = useState<boolean>(false);
+  const [data, setData] = useState<CartProps[]>([]);
 
-  const [books, setBooks] = useState<OrderProps[]>([]);
-  const [argList, setArgList] = useState<BookListItemProps[]>([]);
+  const [creditNumber, setCreditNumber] = useState<string>();
+  const [creditKind, setCreditKind] = useState<string>();
+  const [creditExpiredate, setCreditExpiredate] = useState<string>();
 
-  let totalPrice = 0;
+  const [zipcode, setZipcode] = useState<string>();
+  const [address1, setAddress1] = useState<string>();
+  const [address2, setAddress2] = useState<string>();
 
-  //   const [totalPrice, setTotalPrice] = useState<number>(0);
+  type BookListProps = {
+    books: CartProps[];
+    onListChange: (args: BookListItemProps[]) => void;
+  };
 
-  let table: ReactElement;
+  type BookListItemProps = CartProps & {
+    onQuantityChange?(value: number): void;
+    onClickDelete?(id: string): void;
+  };
 
-  const queryObj = router.query;
-  console.log("queryObj : " + queryObj);
+  const BookItem = (props: BookListItemProps) => {
+    let value = props.quantity;
+    return (
+      <div>
+        <div className="flex flex-row w-screen justify-around">
+          <div>도서 제목: {props.book.title}</div>
+          <div>도서 저자: {props.book.author}</div>
+          <div>도서 가격: {props.book.price}</div>
+          <div>
+            수량:{" "}
+            <input
+              type="number"
+              placeholder="수량"
+              value={value}
+              onChange={(ev) => {
+                props.onQuantityChange(parseInt(ev.target.value));
+              }}
+            ></input>
+          </div>
+          <div
+            onClick={(ev) => {
+              ev.preventDefault();
+              props.onClickDelete(props.book.id);
+            }}
+          >
+            삭제
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const BookList = (props: BookListProps) => {
+    const [argList, setArgList] = useState<BookListItemProps[]>(props.books);
+    let totalPrice = 0;
+    let argumentList;
+    const onQuantityChange = (id: string, value: number): void => {
+      const newArgList = argList.map((arg) => {
+        if (arg != undefined) {
+          if (arg.book.id == id) {
+            return { ...arg, quantity: value };
+          }
+          return arg;
+        }
+      });
+      setArgList(newArgList);
+      props.onListChange(newArgList);
+    };
+
+    const onClickDelete = (id: string): void => {
+      const newArgList = argList.map((arg) => {
+        if (arg.book.id == id) {
+          // pass
+        } else {
+          return arg;
+        }
+      });
+      setArgList(newArgList);
+      props.onListChange(newArgList);
+      const axiosObj = axios.default;
+      axiosObj
+        .delete(
+          "http://localhost:4000/api/v1/cartDetail/" +
+            getCookie("cartNo") +
+            "/" +
+            id
+        )
+        .then((res) => {
+          alert(res.data);
+        });
+    };
+
+    console.log("argList!", argList);
+    if (argList.length >= 1) {
+      argumentList = argList.map((arg, index) => {
+        if (arg == undefined) {
+          // passed
+        } else {
+          totalPrice += arg.book.price * arg.quantity;
+          return (
+            <li key={arg.book.id + index}>
+              <BookItem
+                book={arg.book}
+                quantity={arg.quantity}
+                onQuantityChange={(value) => {
+                  onQuantityChange(arg.book.id, value);
+                }}
+                onClickDelete={(value) => {
+                  onClickDelete(value);
+                }}
+              ></BookItem>
+            </li>
+          );
+        }
+      });
+    } else {
+      argumentList = <>리스트가 없습니다!</>;
+      totalPrice = 0;
+    }
+
+    return (
+      <>
+        <ul>{argumentList.length == 0 ? <></> : argumentList}</ul>
+        <div>주문 총액: {totalPrice}</div>
+      </>
+    );
+  };
 
   useEffect(() => {
-    if (isLoading) {
-      if (queryObj.bookId.length > 1) {
-        console.log("장바구니 없이 단일로 주문" + queryObj.bookId);
+    let tempData: CartDetailProps[];
+    let bookDatas = new Array();
 
-        fetchBookData(queryObj.bookId.toString());
-      } else {
-        const cartId = queryObj.memberId;
-        console.log("장바구니 불러오는 중...." + cartId);
-        // fetchBookListData(cartId[0]);
-      }
+    console.log("Checking isLoading...");
+    if (isLoading) {
+      const axiosObj = axios.default;
+      console.log("fetching cart data...");
+      axiosObj
+        .get("http://localhost:4000/api/v1/cart/" + getCookie("member_no"))
+        .then((res) => {
+          console.log(res.data[0].cart_no);
+          setCookie("cartNo", res.data[0].cart_no);
+          axiosObj
+            .get(
+              "http://localhost:4000/api/v1/cartDetail/" + res.data[0].cart_no
+            )
+            .then((response) => {
+              tempData = response.data;
+              let listLength = tempData.length;
+              if (listLength == 0) {
+                setIsLoading(false);
+              }
+
+              tempData.map((cartDetail) => {
+                axiosObj
+                  .get(
+                    "http://localhost:4000/api/v1/books/" + cartDetail.book_no
+                  )
+                  .then((res) => {
+                    console.log("reading res", res.data);
+
+                    let newBook: BookProps = {
+                      id: res.data.id,
+                      title: res.data.title,
+                      author: res.data.author,
+                      quantity: res.data.quantity,
+                      price: res.data.price,
+                    };
+                    let newCartData: CartProps = {
+                      book: newBook,
+                      quantity: cartDetail.cart_qunaity,
+                    };
+
+                    const list = data;
+                    list.push(newCartData);
+
+                    setData(list);
+                    listLength--;
+                  })
+                  .finally(() => {
+                    console.log("마지막에 실행?", data);
+
+                    if (listLength == 0 || listLength <= 0) {
+                      setIsLoading(false);
+                    }
+                  });
+              });
+            });
+        });
     }
   }, []);
 
-  function fetchBookData(bookId: string) {
-    const axiosObj = axios.default;
-    axiosObj
-      .get("http://localhost:4000/api/v1/books/" + bookId)
-      .then((response) => {
-        let book: OrderProps = {
-          book: {
-            id: response.data.id,
-            title: response.data.title,
-            author: response.data.author,
-            quantity: response.data.quantity,
-            price: response.data.price,
-          },
-          //   아이템에서 바로 주문으로 넘어와서 0으로 처리
-          quantity: 1,
-        };
-        let newBooks = books.map((book) => {
-          return book;
-        });
-        newBooks.push(book);
-
-        setBooks(newBooks);
-        setIsLoading(false);
-      });
-  }
-
-  function fetchBookListData(memberId: string) {
-    const axiosObj = axios.default;
-    axiosObj
-      .get("http://localhost:4000/api/v1/cart/" + memberId)
-      .then((response) => {});
-  }
-
-  function renderTotalPrice() {
-    const totalPriceRender = (
-      <div className="flex flex-row">
-        총 주문금액:{" "}
-        {isNaN(totalPrice) ? (
-          <span>수량을 확인해주십시오</span>
-        ) : (
-          <span>{totalPrice}</span>
-        )}
-      </div>
-    );
-
-    return totalPriceRender;
-  }
-
-  if (isLoading) {
-    table = <>불러오는 중....</>;
-  } else {
-    table = (
-      <BookList
-        books={books}
-        onListChange={(args) => {
-          setArgList(args);
-        }}
-      ></BookList>
-    );
-  }
-
   return (
-    <div className="flex w-screen flex-col">
+    <div>
+      주문
       <div>
-        {/* <div>
+        <div>
           배송지 입력
-          <input type="number">배송지 우편번호</input>
-          <input type="text">기본주소</input>
-          <input type="text">상세주소</input>
+          <input
+            type="number"
+            onChange={(e) => {
+              setZipcode(e.target.value);
+            }}
+          >
+            배송지 우편번호
+          </input>
+          <input
+            type="text"
+            onChange={(e) => {
+              setAddress1(e.target.value);
+            }}
+          >
+            기본주소
+          </input>
+          <input
+            type="text"
+            onChange={(e) => {
+              setAddress2(e.target.value);
+            }}
+          >
+            상세주소
+          </input>
         </div>
         <div>
           카드 정보 입력
-          <input type="text">신용카드 종류</input>
-          <input type="text">신용카드 번호</input>
-          <input type="text">신용카드 유효기간</input>
-        </div> */}
+          <input
+            type="text"
+            onChange={(e) => {
+              setCreditKind(e.target.value);
+            }}
+          >
+            신용카드 종류
+          </input>
+          <input
+            type="text"
+            onChange={(e) => {
+              setCreditNumber(e.target.value);
+            }}
+          >
+            신용카드 번호
+          </input>
+          <input
+            type="text"
+            onChange={(e) => {
+              setCreditExpiredate(e.target.value);
+            }}
+          >
+            신용카드 유효기간
+          </input>
+        </div>
       </div>
-      {table}
-
-      <div className="flex flex-row">
-        <Button
-          size="medium"
-          type="button"
-          color="gray"
-          isDisabled={false}
-          onClick={(ev) => {
-            ev.preventDefault();
-            alert("주문중");
-          }}
-        >
-          주문
-        </Button>
-        <Button
-          size="medium"
-          type="button"
-          color="gray"
-          isDisabled={false}
-          onClick={(ev) => {
-            ev.preventDefault();
-            router.push("/");
-          }}
-        >
-          취소
-        </Button>
+      <div>
+        {isLoading ? (
+          <>불러오는 중...</>
+        ) : (
+          <div className="flex flex-col">
+            <BookList
+              books={data}
+              onListChange={(e) => {
+                setData(e);
+              }}
+            ></BookList>
+            <div>주문</div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -85,6 +85,7 @@ export const SignInPage: React.FC<{}> = () => {
         console.log("Successfully posted data! get data!" + response);
         setCookie("accessToken", response.data.accessToken);
         setCookie("user", response.data.user);
+        setCookie("member_no", UserID);
 
         document.location.href = "/";
       })

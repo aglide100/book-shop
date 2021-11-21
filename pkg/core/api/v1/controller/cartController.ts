@@ -2,6 +2,7 @@ import { BaseController } from "../../../controller/baseController";
 import { Handler, Request, Response } from "express";
 import { CartProps } from "../common/CartProps";
 import { CartDao } from "../dao/cartDao";
+import * as uuid from "uuid";
 
 export class CartController extends BaseController {
   constructor() {
@@ -11,7 +12,7 @@ export class CartController extends BaseController {
   public getAllCart(): Handler {
     return (req: Request, res: Response) => {
       CartDao.getInstance().selectAllCartFromMember((response: any) => {
-        console.log(response);
+        res.send(response);
       }, req.params.MemberId);
     };
   }
@@ -39,7 +40,7 @@ export class CartController extends BaseController {
     return (req: Request, res: Response) => {
       console.log("request createNew Cart");
       let newCart: CartProps = {
-        cart_no: req.body.cartNo,
+        cart_no: uuid.v4(),
         member_no: req.body.memberNo,
         createdDate: req.body.createdDate,
       };
