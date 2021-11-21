@@ -47,7 +47,6 @@ class OrderController extends baseController_1.BaseController {
     }
     createNewOrder() {
         return (req, res) => {
-            orderDao_1.OrderDao.getInstance().insertOrderFromCartReq((response) => { }, req);
             cartDao_1.CartDao.getInstance().selectCartFromNo((cart) => {
                 if (cart != null) {
                     cartDao_1.CartDao.getInstance().selectCartDetailFromNo((books) => {
@@ -77,7 +76,8 @@ class OrderController extends baseController_1.BaseController {
                                 address_address1: req.params.address_address1,
                                 address_address2: req.params.address_address2,
                             };
-                            orderDao_1.OrderDao.getInstance().insertOrderFromCart((response) => { }, newOrder, newBooks);
+                            const result = orderDao_1.OrderDao.getInstance().insertOrderFromCart(newOrder, newBooks, cart.cart_no);
+                            console.log("insert Order : " + result);
                         }
                         else {
                             // 북정보 없을때
@@ -117,7 +117,8 @@ class OrderController extends baseController_1.BaseController {
                         address_address1: req.params.address_address1,
                         address_address2: req.params.address_address2,
                     };
-                    orderDao_1.OrderDao.getInstance().insertOrderFromCart((response) => { }, newOrder, newBooks);
+                    const result = orderDao_1.OrderDao.getInstance().insertOrderFromCart(newOrder, newBooks, null);
+                    console.log("insert Order : " + result);
                 }
             }, req.params.book_no);
         };

@@ -15,7 +15,7 @@ export const LoginPage: React.FC<{}> = () => {
   const [UserPasswordInvalid, setUserPasswordInvalid] =
     useState<ValidationResult["isInvalid"]>("none");
 
-  const [UserName, setUserName] = useState<number>(0);
+  const [UserName, setUserName] = useState<string>("");
   const [UserNameErrorMsg, setUserNameErrorMsg] = useState("");
   const [UserNameInvalid, setUserNameInvalid] =
     useState<ValidationResult["isInvalid"]>("none");
@@ -167,7 +167,7 @@ export const LoginPage: React.FC<{}> = () => {
             isInvalid={false}
             onChange={(UserName) => {
               const { isInvalid, errorMessage } = onUserNameHandle(UserName);
-              setUserName(parseInt(UserName));
+              setUserName(UserName);
               setUserNameErrorMsg(errorMessage);
               setUserNameInvalid(isInvalid);
             }}
