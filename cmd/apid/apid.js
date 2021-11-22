@@ -54,13 +54,13 @@ if (apiVersion == "v1") {
     server.addRule(apiVersion + "/cart/:MemberId", "GET", "get cart", "Cart", CartCtrl.getAllCart());
     server.addRule(apiVersion + "/cart", "POST", "create cart", "Cart", CartCtrl.createNewCart());
     server.addRule(apiVersion + "/cart/:CartId", "DELETE", "delete cart", "Cart", CartCtrl.deleteCart());
-    server.addRule(apiVersion + "/order", "POST", "insert Order", "Order", OrderCtrl.createNewOrder());
-    server.addRule(apiVersion + "/order", "GET", "insert Order", "Order", OrderCtrl.getAllOrder());
-    server.addRule(apiVersion + "/order/:OrderId", "GET", "insert Order", "Order", OrderCtrl.getOrderDetail());
+    server.addRule(apiVersion + "/order", "POST", "Create new Order", "Order", OrderCtrl.createNewOrder());
+    server.addRule(apiVersion + "/order", "GET", "Get Order list", "Order", OrderCtrl.getAllOrder());
+    server.addRule(apiVersion + "/order/:OrderId", "GET", "get Order detail", "Order", OrderCtrl.getOrderDetail());
+    server.addRule(apiVersion + "/cartDetail/update", "POST", "Update order list", "Order", CartDetailCtrl.updateCartDetail());
     server.addRule(apiVersion + "/cartDetail", "POST", "insert new Cart_Book", "Cart_Book", CartDetailCtrl.createNewCartDetail());
     server.addRule(apiVersion + "/cartDetail/:CartNo/:BookNo", "DELETE", "Delete new Cart_Book", "Cart_Book", CartDetailCtrl.deleteCartDetail());
     server.addRule(apiVersion + "/cartDetail/:CartNo", "GET", "GET Cart_Book list", "Cart_Book", CartDetailCtrl.getAllCartDetailFromCartNo());
-    server.addRule(apiVersion + "/cartDetail/update/:CartNo", "POST", "GET Cart_Book list", "Cart_Book", CartDetailCtrl.updateCartDetail());
     // server.addRule()
 }
 server.listen(port);

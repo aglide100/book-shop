@@ -61,10 +61,11 @@ export class CartDao extends BaseDao {
       }
       const list = result.rows;
 
+      console.log("Is it run? 2", list);
       // noinspection DuplicatedCode
-      client.end();
+      callback(result.rows[0]);
 
-      callback(list[0]);
+      client.end();
     });
   }
 
@@ -80,14 +81,15 @@ export class CartDao extends BaseDao {
 
       if (result.rows.length == 0) {
         console.log("There is no Cart! creating new one....", memberNo);
-
+        const newCartNo = uuid.v4();
         let cart: CartProps = {
-          cart_no: uuid.v4(),
+          cart_no: newCartNo,
           member_no: memberNo,
           createdDate: "",
         };
         this.insertNewCart(cart);
-        callback(cart.cart_no);
+
+        callback(newCartNo);
       } else {
         callback(result.rows[0]);
       }
@@ -105,7 +107,7 @@ export class CartDao extends BaseDao {
         console.log("Can't exec query!" + err);
       }
       const list = result.rows;
-      let data = Array();
+      let data = new Array();
 
       // noinspection DuplicatedCode
       client.end();
@@ -120,6 +122,7 @@ export class CartDao extends BaseDao {
 
         data.push(details);
       }
+      console.log("look here !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!", list);
 
       callback(data);
     });
@@ -133,10 +136,8 @@ export class CartDao extends BaseDao {
 
     client.query(q, [cart.cart_no, cart.member_no], (err, result) => {
       if (err) {
-        console.log("Can't exec query!" + err);
+        console.log("Can't exec query! Insert New Cart" + err);
       }
-
-      console.log(result);
 
       client.end();
     });

@@ -14,13 +14,14 @@ export type CartProps = {
 type CartDetailProps = {
   cart_no: string;
   book_no: string;
-  cart_qunaity: number;
+  cart_quantity: number;
   cart_price: number;
 };
 
 export const CartPage: React.FC<{}> = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [data, setData] = useState<CartProps[]>([]);
+  const [originData, setOriginData] = useState<CartProps[]>([]);
 
   type BookListProps = {
     books: CartProps[];
@@ -68,6 +69,7 @@ export const CartPage: React.FC<{}> = () => {
     const [argList, setArgList] = useState<BookListItemProps[]>(props.books);
     let totalPrice = 0;
     let argumentList;
+
     const onQuantityChange = (id: string, value: number): void => {
       const newArgList = argList.map((arg) => {
         if (arg != undefined) {
@@ -83,10 +85,12 @@ export const CartPage: React.FC<{}> = () => {
 
     const onClickDelete = (id: string): void => {
       const newArgList = argList.map((arg) => {
-        if (arg.book.id == id) {
-          // pass
-        } else {
-          return arg;
+        if (arg != undefined) {
+          if (arg.book.id == id) {
+            // pass
+          } else {
+            return arg;
+          }
         }
       });
       setArgList(newArgList);
@@ -140,9 +144,10 @@ export const CartPage: React.FC<{}> = () => {
     );
   };
 
+  const router = useRouter();
+
   useEffect(() => {
     let tempData: CartDetailProps[];
-    let bookDatas = new Array();
 
     console.log("Checking isLoading...");
     if (isLoading) {
@@ -165,6 +170,7 @@ export const CartPage: React.FC<{}> = () => {
               }
 
               tempData.map((cartDetail) => {
+                console.log("may be cart?", cartDetail);
                 axiosObj
                   .get(
                     "http://localhost:4000/api/v1/books/" + cartDetail.book_no
@@ -181,13 +187,14 @@ export const CartPage: React.FC<{}> = () => {
                     };
                     let newCartData: CartProps = {
                       book: newBook,
-                      quantity: cartDetail.cart_qunaity,
+                      quantity: cartDetail.cart_quantity,
                     };
 
                     const list = data;
                     list.push(newCartData);
 
                     setData(list);
+                    setOriginData(list);
                     listLength--;
                   })
                   .finally(() => {
@@ -217,7 +224,50 @@ export const CartPage: React.FC<{}> = () => {
                 setData(e);
               }}
             ></BookList>
-            <div>주문</div>
+            <Button
+              size="medium"
+              type="button"
+              color="gray"
+              isDisabled={false}
+              onClick={(ev) => {
+                ev.preventDefault();
+                const axiosObj = axios.default;
+
+                if (data != originData) {
+                  const listLength = data.length;
+
+                  data.map((book, index) => {
+                    const tempCart: CartDetailProps = {
+                      cart_no: getCookie("cartNo"),
+                      book_no: book.book.id,
+                      cart_price: book.quantity * book.book.price,
+                      cart_quantity: book.quantity,
+                    };
+
+                    console.log("update cart book", tempCart);
+                    axiosObj
+                      .post(
+                        "http://localhost:4000/api/v1/cartDetail/update/",
+                        tempCart,
+                        {
+                          headers: {
+                            "Content-Type": "application/json",
+                          },
+                        }
+                      )
+                      .then((res) => {
+                        if (index == listLength - 1) {
+                          router.push("/order");
+                        }
+                      });
+                  });
+                } else {
+                  router.push("/order");
+                }
+              }}
+            >
+              주문
+            </Button>
           </div>
         )}
       </div>

@@ -136,7 +136,7 @@ if (apiVersion == "v1") {
   server.addRule(
     apiVersion + "/order",
     "POST",
-    "insert Order",
+    "Create new Order",
     "Order",
     OrderCtrl.createNewOrder()
   );
@@ -144,7 +144,7 @@ if (apiVersion == "v1") {
   server.addRule(
     apiVersion + "/order",
     "GET",
-    "insert Order",
+    "Get Order list",
     "Order",
     OrderCtrl.getAllOrder()
   );
@@ -152,9 +152,17 @@ if (apiVersion == "v1") {
   server.addRule(
     apiVersion + "/order/:OrderId",
     "GET",
-    "insert Order",
+    "get Order detail",
     "Order",
     OrderCtrl.getOrderDetail()
+  );
+
+  server.addRule(
+    apiVersion + "/cartDetail/update",
+    "POST",
+    "Update order list",
+    "Order",
+    CartDetailCtrl.updateCartDetail()
   );
 
   server.addRule(
@@ -179,14 +187,6 @@ if (apiVersion == "v1") {
     "GET Cart_Book list",
     "Cart_Book",
     CartDetailCtrl.getAllCartDetailFromCartNo()
-  );
-
-  server.addRule(
-    apiVersion + "/cartDetail/update/:CartNo",
-    "POST",
-    "GET Cart_Book list",
-    "Cart_Book",
-    CartDetailCtrl.updateCartDetail()
   );
 
   // server.addRule()

@@ -32,9 +32,9 @@ export class CartDetailController extends BaseController {
 
         let newCart: CartDetailProps = {
           cart_no: response.cart_no,
-          book_no: req.body.bookNo,
-          cart_price: req.body.cartPrice,
-          cart_qunaity: req.body.cartQuantity,
+          book_no: req.body.book_no,
+          cart_price: req.body.cart_price,
+          cart_quantity: req.body.cart_quantity,
         };
 
         let ok = CartDetailDao.getInstance().insertNewCartDetail(newCart);
@@ -43,7 +43,7 @@ export class CartDetailController extends BaseController {
         } else {
           res.status(200).send("error :" + ok);
         }
-      }, req.body.memberNo);
+      }, req.body.member_no);
 
       console.log("request createNew CartDetail");
     };
@@ -53,25 +53,21 @@ export class CartDetailController extends BaseController {
     return (req: Request, res: Response) => {
       // console.log("createNewCartDetail", req.body.memberNo);
 
-      CartDao.getInstance().getCartNoFromMemberNo((response: any) => {
-        // console.log("CART NO", response);
+      let newCart: CartDetailProps = {
+        cart_no: req.body.cart_no,
+        book_no: req.body.book_no,
+        cart_price: req.body.cart_price,
+        cart_quantity: req.body.cart_quantity,
+      };
 
-        let newCart: CartDetailProps = {
-          cart_no: response.cart_no,
-          book_no: req.body.bookNo,
-          cart_price: req.body.cartPrice,
-          cart_qunaity: req.body.cartQuantity,
-        };
+      let ok = CartDetailDao.getInstance().updateCartDetail(newCart);
+      if (ok == null) {
+        res.status(200).send("done");
+      } else {
+        res.status(200).send("error :" + ok);
+      }
 
-        let ok = CartDetailDao.getInstance().updateCartDetail(newCart);
-        if (ok == null) {
-          res.status(200).send("done");
-        } else {
-          res.status(200).send("error :" + ok);
-        }
-      }, req.body.memberNo);
-
-      console.log("request createNew CartDetail");
+      console.log("request update CartDetail");
     };
   }
 

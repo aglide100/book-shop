@@ -50,7 +50,7 @@ class CartDetailDao extends baseDao_1.BaseDao {
                 let item = {
                     cart_no: cartDetail.cart_no,
                     book_no: cartDetail.book_no,
-                    cart_qunaity: cartDetail.cart_quantity,
+                    cart_quantity: cartDetail.cart_quantity,
                     cart_price: cartDetail.cart_price,
                 };
                 return item;
@@ -91,7 +91,7 @@ class CartDetailDao extends baseDao_1.BaseDao {
         client.query(q, [
             cartDetail.book_no,
             cartDetail.cart_no,
-            cartDetail.cart_qunaity,
+            cartDetail.cart_quantity,
             cartDetail.cart_price,
         ], (err, result) => {
             if (err) {
@@ -102,13 +102,13 @@ class CartDetailDao extends baseDao_1.BaseDao {
         });
     }
     updateCartDetail(cartDetail) {
-        console.log("insertNewCartDetail ,", cartDetail);
+        console.log("update cartDetail ,", cartDetail);
         const q = `UPDATE "Cart_Book" SET book_no = $1, cart_no = $2, cart_quantity = $3, cart_price = $4 WHERE  book_no = $1 AND cart_no = $2`;
         var client = this.getClient();
         client.query(q, [
             cartDetail.book_no,
             cartDetail.cart_no,
-            cartDetail.cart_qunaity,
+            cartDetail.cart_quantity,
             cartDetail.cart_price,
         ], (err, result) => {
             if (err) {

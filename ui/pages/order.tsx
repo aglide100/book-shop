@@ -14,13 +14,15 @@ export type CartProps = {
 type CartDetailProps = {
   cart_no: string;
   book_no: string;
-  cart_qunaity: number;
+  cart_quantity: number;
   cart_price: number;
 };
 
 export const OrderPage: React.FC<{}> = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [data, setData] = useState<CartProps[]>([]);
+
+  const [originData, setOriginData] = useState<CartProps[]>([]);
 
   const [creditNumber, setCreditNumber] = useState<string>();
   const [creditKind, setCreditKind] = useState<string>();
@@ -29,6 +31,8 @@ export const OrderPage: React.FC<{}> = () => {
   const [zipcode, setZipcode] = useState<string>();
   const [address1, setAddress1] = useState<string>();
   const [address2, setAddress2] = useState<string>();
+
+  const router = useRouter();
 
   type BookListProps = {
     books: CartProps[];
@@ -150,7 +154,6 @@ export const OrderPage: React.FC<{}> = () => {
 
   useEffect(() => {
     let tempData: CartDetailProps[];
-    let bookDatas = new Array();
 
     console.log("Checking isLoading...");
     if (isLoading) {
@@ -173,6 +176,7 @@ export const OrderPage: React.FC<{}> = () => {
               }
 
               tempData.map((cartDetail) => {
+                console.log("may be cart?", cartDetail);
                 axiosObj
                   .get(
                     "http://localhost:4000/api/v1/books/" + cartDetail.book_no
@@ -189,13 +193,14 @@ export const OrderPage: React.FC<{}> = () => {
                     };
                     let newCartData: CartProps = {
                       book: newBook,
-                      quantity: cartDetail.cart_qunaity,
+                      quantity: cartDetail.cart_quantity,
                     };
 
                     const list = data;
                     list.push(newCartData);
 
                     setData(list);
+                    setOriginData(list);
                     listLength--;
                   })
                   .finally(() => {
@@ -213,63 +218,7 @@ export const OrderPage: React.FC<{}> = () => {
 
   return (
     <div>
-      주문
-      <div>
-        <div>
-          배송지 입력
-          <input
-            type="number"
-            onChange={(e) => {
-              setZipcode(e.target.value);
-            }}
-          >
-            배송지 우편번호
-          </input>
-          <input
-            type="text"
-            onChange={(e) => {
-              setAddress1(e.target.value);
-            }}
-          >
-            기본주소
-          </input>
-          <input
-            type="text"
-            onChange={(e) => {
-              setAddress2(e.target.value);
-            }}
-          >
-            상세주소
-          </input>
-        </div>
-        <div>
-          카드 정보 입력
-          <input
-            type="text"
-            onChange={(e) => {
-              setCreditKind(e.target.value);
-            }}
-          >
-            신용카드 종류
-          </input>
-          <input
-            type="text"
-            onChange={(e) => {
-              setCreditNumber(e.target.value);
-            }}
-          >
-            신용카드 번호
-          </input>
-          <input
-            type="text"
-            onChange={(e) => {
-              setCreditExpiredate(e.target.value);
-            }}
-          >
-            신용카드 유효기간
-          </input>
-        </div>
-      </div>
+      <div>주문</div>
       <div>
         {isLoading ? (
           <>불러오는 중...</>
@@ -281,9 +230,133 @@ export const OrderPage: React.FC<{}> = () => {
                 setData(e);
               }}
             ></BookList>
-            <div>주문</div>
           </div>
         )}
+      </div>
+      <div>
+        <div className="flex flex-col justify-center">
+          <div>배송지 입력</div>
+          <hr />
+          <div className="flex ml-5 mt-5">
+            <p>배송지 우편번호</p>
+            <input
+              type="number"
+              value={zipcode}
+              placeholder={"00000"}
+              onChange={(e) => {
+                setZipcode(e.target.value);
+              }}
+            ></input>
+          </div>
+          <div className="flex ml-5 mt-5">
+            <p>기본주소</p>
+            <input
+              type="text"
+              value={address1}
+              placeholder={"기본주소"}
+              onChange={(e) => {
+                setAddress1(e.target.value);
+              }}
+            ></input>
+          </div>
+          <div className="flex ml-5 mt-5">
+            <p>상세주소</p>
+            <input
+              type="text"
+              value={address2}
+              placeholder={"상세주소"}
+              onChange={(e) => {
+                setAddress2(e.target.value);
+              }}
+            ></input>
+          </div>
+        </div>
+        <div>
+          <div>카드 정보 입력</div>
+          <hr />
+          <div className="flex ml-5 mt-5">
+            <p>신용카드 종류</p>
+            <input
+              type="text"
+              value={creditKind}
+              placeholder={"Visa"}
+              onChange={(e) => {
+                setCreditKind(e.target.value);
+              }}
+            ></input>
+          </div>
+          <div className="flex ml-5 mt-5">
+            <p>신용카드 번호</p>
+            <input
+              type="text"
+              value={creditNumber}
+              placeholder={"0000-0000-0000-0000"}
+              onChange={(e) => {
+                setCreditNumber(e.target.value);
+              }}
+            ></input>
+          </div>
+          <div className="flex ml-5 mt-5">
+            <p>신용카드 유효기간</p>
+            <input
+              type="text"
+              value={creditExpiredate}
+              placeholder={"00/00"}
+              onChange={(e) => {
+                setCreditExpiredate(e.target.value);
+              }}
+            ></input>
+          </div>
+          <Button
+            size="medium"
+            type="button"
+            color="gray"
+            isDisabled={false}
+            onClick={(ev) => {
+              ev.preventDefault();
+
+              const axiosObj = axios.default;
+
+              let data = {
+                cart_no: getCookie("cartNo"),
+                member_no: getCookie("member_no"),
+                credit_number: creditNumber,
+                credit_kind: creditKind,
+                credit_expiredate: creditExpiredate,
+                address_zipcode: zipcode,
+                address_address1: address1,
+                address_address2: address2,
+              };
+
+              console.log("Sending...", data);
+              axiosObj
+                .post("http://localhost:4000/api/v1/order/", data, {
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                })
+                .then((res) => {
+                  router.push("/");
+                });
+
+              // if (data != originData) {
+              //   const listLength = data.length;
+
+              //   data.map((book, index) => {
+              //     const tempCart: CartDetailProps = {
+              //       cart_no: getCookie("cartNo"),
+              //       book_no: book.book.id,
+              //       cart_price: book.quantity * book.book.price,
+              //       cart_quantity: book.quantity,
+              //     };
+              //   });
+              // } else {
+              // }
+            }}
+          >
+            주문
+          </Button>
+        </div>
       </div>
     </div>
   );

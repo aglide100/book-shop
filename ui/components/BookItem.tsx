@@ -189,12 +189,14 @@ export const BookItem = (props: BookProps) => {
                         const axiosObj = axios.default;
 
                         const data = JSON.stringify({
-                          memberNo: getCookie("member_no"),
-                          bookNo: props.id,
-                          cartQuantity: quantity,
+                          member_no: getCookie("member_no"),
+                          book_no: props.id,
+                          cart_quantity: quantity,
                           // 할인율
-                          cartPrice: props.price * quantity,
+                          cart_price: props.price * quantity,
                         });
+
+                        console.log("장바구니", data);
 
                         axiosObj
                           .post(

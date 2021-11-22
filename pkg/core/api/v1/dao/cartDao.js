@@ -76,9 +76,10 @@ class CartDao extends baseDao_1.BaseDao {
                 console.log("Can't exec query!" + err);
             }
             const list = result.rows;
+            console.log("Is it run? 2", list);
             // noinspection DuplicatedCode
+            callback(result.rows[0]);
             client.end();
-            callback(list[0]);
         });
     }
     getCartNoFromMemberNo(callback, memberNo) {
@@ -91,13 +92,14 @@ class CartDao extends baseDao_1.BaseDao {
             }
             if (result.rows.length == 0) {
                 console.log("There is no Cart! creating new one....", memberNo);
+                const newCartNo = uuid.v4();
                 let cart = {
-                    cart_no: uuid.v4(),
+                    cart_no: newCartNo,
                     member_no: memberNo,
                     createdDate: "",
                 };
                 this.insertNewCart(cart);
-                callback(cart.cart_no);
+                callback(newCartNo);
             }
             else {
                 callback(result.rows[0]);
@@ -113,7 +115,7 @@ class CartDao extends baseDao_1.BaseDao {
                 console.log("Can't exec query!" + err);
             }
             const list = result.rows;
-            let data = Array();
+            let data = new Array();
             // noinspection DuplicatedCode
             client.end();
             for (var i = 0; i < list.length; i++) {
@@ -125,6 +127,7 @@ class CartDao extends baseDao_1.BaseDao {
                 };
                 data.push(details);
             }
+            console.log("look here !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!", list);
             callback(data);
         });
     }
@@ -134,9 +137,8 @@ class CartDao extends baseDao_1.BaseDao {
         var client = this.getClient();
         client.query(q, [cart.cart_no, cart.member_no], (err, result) => {
             if (err) {
-                console.log("Can't exec query!" + err);
+                console.log("Can't exec query! Insert New Cart" + err);
             }
-            console.log(result);
             client.end();
         });
     }

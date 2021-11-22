@@ -34,17 +34,21 @@ export class OrderController extends BaseController {
   }
 
   public createNewOrder(): Handler {
+    var newBooks = new Array();
     return (req: Request, res: Response) => {
-      CartDao.getInstance().selectCartFromNo((cart: CartProps) => {
+      console.log("Cart No in createNewOrder", req.params.cart_no);
+      CartDao.getInstance().selectCartFromNo((cart: any) => {
         if (cart != null) {
+          console.log("Is it run? 1 cart", cart);
           CartDao.getInstance().selectCartDetailFromNo(
             (books: [CartBookProps]) => {
               if (books.length > 0) {
                 var totalPrice = 0;
                 const id = uuid.v4();
-                var newBooks = Array();
+
                 for (var i = 0; i < books.length; i++) {
                   totalPrice += books[i].cart_price;
+                  console.log("!!!!!!!!!!!!!!!!!", books[i]);
                   let tempBooks: OrderDetailProps = {
                     order_no: id,
                     book_no: books[i].book_no,
@@ -59,12 +63,12 @@ export class OrderController extends BaseController {
                   orderdate: "",
                   price: totalPrice,
                   member_no: cart.member_no,
-                  credit_number: req.params.credit_number,
-                  credit_kind: req.params.credit_kind,
-                  credit_expiredate: req.params.credit_expiredate,
-                  address_zipcode: req.params.address_zipcode,
-                  address_address1: req.params.address_address1,
-                  address_address2: req.params.address_address2,
+                  credit_number: req.body.credit_number,
+                  credit_kind: req.body.credit_kind,
+                  credit_expiredate: req.body.credit_expiredate,
+                  address_zipcode: req.body.address_zipcode,
+                  address_address1: req.body.address_address1,
+                  address_address2: req.body.address_address2,
                 };
 
                 const result = OrderDao.getInstance().insertOrderFromCart(
@@ -82,7 +86,7 @@ export class OrderController extends BaseController {
         } else {
           // 카드 정보 없을때 처리
         }
-      }, req.params.cart_no);
+      }, req.body.cart_no);
     };
   }
 
@@ -106,23 +110,25 @@ export class OrderController extends BaseController {
             order_no: id,
             orderdate: "",
             price: totalPrice,
-            member_no: req.params.member_no,
-            credit_number: req.params.credit_number,
-            credit_kind: req.params.credit_kind,
-            credit_expiredate: req.params.credit_expiredate,
-            address_zipcode: req.params.address_zipcode,
-            address_address1: req.params.address_address1,
-            address_address2: req.params.address_address2,
+            member_no: req.body.member_no,
+            credit_number: req.body.credit_number,
+            credit_kind: req.body.credit_kind,
+            credit_expiredate: req.body.credit_expiredate,
+            address_zipcode: req.body.address_zipcode,
+            address_address1: req.body.address_address1,
+            address_address2: req.body.address_address2,
           };
 
-          const result = OrderDao.getInstance().insertOrderFromCart(
+          let result = OrderDao.getInstance().insertOrderFromCart(
             newOrder,
             newBooks,
             null
           );
-          console.log("insert Order : " + result);
+          result.then((response) => {
+            console.log("insert Order : " + response);
+          });
         }
-      }, req.params.book_no);
+      }, req.body.book_no);
     };
   }
 }
