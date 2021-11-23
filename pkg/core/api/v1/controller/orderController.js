@@ -82,6 +82,7 @@ class OrderController extends baseController_1.BaseController {
                                 address_zipcode: req.body.address_zipcode,
                                 address_address1: req.body.address_address1,
                                 address_address2: req.body.address_address2,
+                                discount: req.body.discount,
                             };
                             let result = orderDao_1.OrderDao.getInstance().insertOrderFromCart(newOrder, newBooks, cart.cart_no, () => {
                                 res.send("done");
@@ -127,6 +128,7 @@ class OrderController extends baseController_1.BaseController {
                         address_zipcode: req.body.address_zipcode,
                         address_address1: req.body.address_address1,
                         address_address2: req.body.address_address2,
+                        discount: req.body.discount,
                     };
                     const result = orderDao_1.OrderDao.getInstance().insertOrderFromCart(newOrder, newBooks, null, () => {
                         res.send("done");

@@ -9,4 +9,5 @@ export type OrderProps = {
   address_zipcode: string;
   address_address1: string;
   address_address2: string;
+  discount: number;
 };

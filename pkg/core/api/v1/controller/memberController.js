@@ -42,6 +42,7 @@ class MemberController extends baseController_1.BaseController {
                 member_no: req.body.member_no,
                 name: "",
                 password: req.body.password,
+                recommender: req.body.recommender,
             };
             memberDao_1.MemberDao.getInstance().selectMember(newUser, (result, error) => {
                 if (error != null || result == null) {
@@ -63,6 +64,7 @@ class MemberController extends baseController_1.BaseController {
                 member_no: req.body.member_no,
                 name: req.body.name,
                 password: req.body.password,
+                recommender: req.body.recommender,
             };
             memberDao_1.MemberDao.getInstance().insertMember(newUser, (result, error) => {
                 if (error != null || result == null) {

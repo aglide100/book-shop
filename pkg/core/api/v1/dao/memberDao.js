@@ -38,6 +38,7 @@ class MemberDao extends baseDao_1.BaseDao {
                     member_no: list[i].member_no,
                     name: list[i].name,
                     password: list[i].password,
+                    recommender: list[i].recommender,
                 };
                 data.push(newMember);
             }
@@ -83,15 +84,24 @@ class MemberDao extends baseDao_1.BaseDao {
         });
     }
     insertMember(member, callback) {
-        const q = `INSERT INTO "Member"(member_no, name, password) values ($1, $2, $3)`;
+        const q = `INSERT INTO "Member"(member_no, name, password, recommender, point) values ($1, $2, $3, $4, '0')`;
         const client = this.getClient();
-        client.query(q, [member.member_no, member.name, member.password], (err, result) => {
-            client.end();
+        const giveQ = `UPDATE "Member" SET point = point + '10000' WHERE member_no = $1`;
+        if (member.recommender != undefined) {
+            console.log("recommnder", member.recommender);
+            client.query(giveQ, [member.recommender], (err, result) => {
+                if (err) {
+                    console.log("Can't exec query! When add recommender" + err);
+                }
+            });
+        }
+        client.query(q, [member.member_no, member.name, member.password, member.recommender], (err, result) => {
             if (err) {
                 console.log("Can't exec query!" + err);
                 callback(null, err);
                 return;
             }
+            client.end();
             this.selectMember(member, callback);
         });
     }

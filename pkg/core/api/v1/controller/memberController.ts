@@ -26,6 +26,7 @@ export class MemberController extends BaseController {
         member_no: req.body.member_no,
         name: "",
         password: req.body.password,
+        recommender: req.body.recommender,
       };
 
       MemberDao.getInstance().selectMember(
@@ -52,6 +53,7 @@ export class MemberController extends BaseController {
         member_no: req.body.member_no,
         name: req.body.name,
         password: req.body.password,
+        recommender: req.body.recommender,
       };
 
       MemberDao.getInstance().insertMember(

@@ -44,6 +44,7 @@ export class OrderDao extends BaseDao {
           address_zipcode: list[i].address_zipcode,
           address_address1: list[i].address_address1,
           address_address2: list[i].address_address2,
+          discount: list[i].discount,
         };
 
         data.push(newCart);
@@ -95,7 +96,19 @@ export class OrderDao extends BaseDao {
     try {
       await client.query("BEGIN");
       console.log("Is it run? 5");
-      const orderQ = `INSERT INTO "Order"(order_no, order_date, price, member_no, credit_number, credit_kind, credit_expiredate, address_zipcode, address_address1, address_address2) values ($1, NOW(), $2, $3, $4, $5, $6, $7, $8, $9)`;
+      const orderQ = `INSERT INTO "Order"(order_no, order_date, price, member_no, credit_number, credit_kind, credit_expiredate, address_zipcode, address_address1, address_address2, discount) values ($1, NOW(), $2, $3, $4, $5, $6, $7, $8, $9, $10)`;
+
+      const giveQ = `UPDATE "Member" SET point = point - $1 WHERE member_no = $2`;
+      let temp = await client.query(
+        giveQ,
+        [order.discount, order.member_no],
+        (err, result) => {
+          if (err) {
+            console.log("Can't exec query! When add recommender" + err);
+          }
+        }
+      );
+
       let res = await client.query(orderQ, [
         order.order_no,
         order.price,
@@ -106,6 +119,7 @@ export class OrderDao extends BaseDao {
         order.address_zipcode,
         order.address_address1,
         order.address_address2,
+        order.discount,
       ]);
 
       console.log("Is done?");

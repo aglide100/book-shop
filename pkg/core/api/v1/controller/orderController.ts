@@ -73,6 +73,7 @@ export class OrderController extends BaseController {
                 address_zipcode: req.body.address_zipcode,
                 address_address1: req.body.address_address1,
                 address_address2: req.body.address_address2,
+                discount: req.body.discount,
               };
 
               let result = OrderDao.getInstance().insertOrderFromCart(
@@ -125,6 +126,7 @@ export class OrderController extends BaseController {
             address_zipcode: req.body.address_zipcode,
             address_address1: req.body.address_address1,
             address_address2: req.body.address_address2,
+            discount: req.body.discount,
           };
 
           const result = OrderDao.getInstance().insertOrderFromCart(

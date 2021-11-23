@@ -15,6 +15,7 @@ export type OrderProps = {
   address_zipcode: string;
   address_address1: string;
   address_address2: string;
+  discount: number;
 };
 
 export const OrderListPage: React.FC<{}> = () => {
@@ -40,7 +41,8 @@ export const OrderListPage: React.FC<{}> = () => {
       <div>
         <div className="flex flex-row w-screen justify-around">
           <div>주문 날짜: {props.orderdate}</div>
-          <div>주문 금액: {props.price}</div>
+          <div>주문 금액: {parseInt(props.price) - props.discount}</div>
+          <div>할인 금액: {props.discount}</div>
 
           {/* <div
             onClick={(ev) => {
@@ -100,6 +102,7 @@ export const OrderListPage: React.FC<{}> = () => {
                 address_address1={arg.address_address1}
                 address_address2={arg.address_address2}
                 address_zipcode={arg.address_zipcode}
+                discount={arg.discount}
                 onClickDelete={(value) => {
                   onClickDelete(value);
                 }}
@@ -151,6 +154,7 @@ export const OrderListPage: React.FC<{}> = () => {
                 address_zipcode: order.address_zipcode,
                 address_address1: order.address_address1,
                 address_address2: order.address_address2,
+                discount: order.discount,
               };
 
               data.push(newOrder);

@@ -38,6 +38,7 @@ export class MemberDao extends BaseDao {
           member_no: list[i].member_no,
           name: list[i].name,
           password: list[i].password,
+          recommender: list[i].recommender,
         };
         data.push(newMember);
       }
@@ -91,21 +92,30 @@ export class MemberDao extends BaseDao {
   }
 
   public insertMember(member: MemberProps, callback: Function) {
-    const q = `INSERT INTO "Member"(member_no, name, password) values ($1, $2, $3)`;
+    const q = `INSERT INTO "Member"(member_no, name, password, recommender, point) values ($1, $2, $3, $4, '0')`;
     const client = this.getClient();
+    const giveQ = `UPDATE "Member" SET point = point + '10000' WHERE member_no = $1`;
+
+    if (member.recommender != undefined) {
+      console.log("recommnder", member.recommender);
+      client.query(giveQ, [member.recommender], (err, result) => {
+        if (err) {
+          console.log("Can't exec query! When add recommender" + err);
+        }
+      });
+    }
 
     client.query(
       q,
-      [member.member_no, member.name, member.password],
+      [member.member_no, member.name, member.password, member.recommender],
       (err, result) => {
-        client.end();
-
         if (err) {
           console.log("Can't exec query!" + err);
           callback(null, err);
           return;
         }
 
+        client.end();
         this.selectMember(member, callback);
       }
     );

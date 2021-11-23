@@ -32,6 +32,8 @@ export const OrderPage: React.FC<{}> = () => {
   const [address1, setAddress1] = useState<string>();
   const [address2, setAddress2] = useState<string>();
 
+  const [point, setPoint] = useState<string>();
+
   const router = useRouter();
 
   type BookListProps = {
@@ -309,6 +311,18 @@ export const OrderPage: React.FC<{}> = () => {
               }}
             ></input>
           </div>
+
+          <div className="flex ml-5 mt-5 ">
+            <p>포인트</p>
+            <input
+              type="text"
+              value={point}
+              placeholder={"0"}
+              onChange={(e) => {
+                setPoint(e.target.value);
+              }}
+            ></input>
+          </div>
           <div className="ml-5 mt-5">
             {" "}
             <Button
@@ -330,6 +344,7 @@ export const OrderPage: React.FC<{}> = () => {
                   address_zipcode: zipcode,
                   address_address1: address1,
                   address_address2: address2,
+                  discount: point,
                 };
 
                 console.log("Sending...", data);

@@ -20,6 +20,11 @@ export const SignUpPage: React.FC<{}> = () => {
   const [UserNameInvalid, setUserNameInvalid] =
     useState<ValidationResult["isInvalid"]>("none");
 
+  const [recommender, setRecommender] = useState<string>("");
+  const [recommenderErrorMsg, setRecommenderErrorMsg] = useState("");
+  const [recommenderInvalid, setRecommenderInvalid] =
+    useState<ValidationResult["isInvalid"]>("none");
+
   const router = useRouter();
 
   const onUserIDHandle = (userID) => {
@@ -97,6 +102,7 @@ export const SignUpPage: React.FC<{}> = () => {
       member_no: UserID,
       password: UserPassword,
       name: UserName,
+      recommender: recommender,
     });
     const axiosObj = axios.default;
 
@@ -169,6 +175,24 @@ export const SignUpPage: React.FC<{}> = () => {
               setUserName(UserName);
               setUserNameErrorMsg(errorMessage);
               setUserNameInvalid(isInvalid);
+            }}
+          ></InputField>
+        </div>
+
+        <div className="mt-3">
+          <InputField
+            type="text"
+            name="text"
+            placeholder="추천인"
+            label="추천인"
+            isAutocomplete={false}
+            validationErrorMsg={recommenderErrorMsg}
+            isInvalid={false}
+            onChange={(recommender) => {
+              const { isInvalid, errorMessage } = onUserIDHandle(recommender);
+              setRecommender(recommender);
+              setRecommenderErrorMsg(errorMessage);
+              setRecommenderInvalid(isInvalid);
             }}
           ></InputField>
         </div>

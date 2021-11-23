@@ -1,10 +1,15 @@
 create table if not exists "Member"
 (
-    member_no varchar not null
+    member_no   varchar not null
         constraint member_pk
             primary key,
-    password  varchar not null,
-    name      varchar not null
+    password    varchar not null,
+    name        varchar not null,
+    recommender varchar
+        constraint " recommender"
+            references "Member"
+            on update cascade on delete cascade,
+    point       integer
 );
 
 comment on table "Member" is '회원';
