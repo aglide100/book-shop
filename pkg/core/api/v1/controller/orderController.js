@@ -32,9 +32,14 @@ class OrderController extends baseController_1.BaseController {
     getAllOrder() {
         return (req, res) => {
             console.log("returns order list");
-            orderDao_1.OrderDao.getInstance().selectOrderDetailFromNo((response) => {
+            orderDao_1.OrderDao.getInstance().selectAllOrderFromMember((response) => {
                 console.log(response);
+                res.send(response);
             }, req.params.MemberId);
+            // OrderDao.getInstance().selectOrderDetailFromNo((response: any) => {
+            //   console.log(response);
+            //   res.send(response)
+            // }, req.params.MemberId);
         };
     }
     getOrderDetail() {
@@ -58,7 +63,6 @@ class OrderController extends baseController_1.BaseController {
                             const id = uuid.v4();
                             for (var i = 0; i < books.length; i++) {
                                 totalPrice += books[i].cart_price;
-                                console.log("!!!!!!!!!!!!!!!!!", books[i]);
                                 let tempBooks = {
                                     order_no: id,
                                     book_no: books[i].book_no,
@@ -79,8 +83,12 @@ class OrderController extends baseController_1.BaseController {
                                 address_address1: req.body.address_address1,
                                 address_address2: req.body.address_address2,
                             };
-                            const result = orderDao_1.OrderDao.getInstance().insertOrderFromCart(newOrder, newBooks, cart.cart_no);
-                            console.log("insert Order : " + result);
+                            let result = orderDao_1.OrderDao.getInstance().insertOrderFromCart(newOrder, newBooks, cart.cart_no, () => {
+                                res.send("done");
+                            });
+                            // result.finally(() => {
+                            //   console.log("insert Order : 바깥");
+                            // });
                         }
                         else {
                             // 북정보 없을때
@@ -120,9 +128,8 @@ class OrderController extends baseController_1.BaseController {
                         address_address1: req.body.address_address1,
                         address_address2: req.body.address_address2,
                     };
-                    let result = orderDao_1.OrderDao.getInstance().insertOrderFromCart(newOrder, newBooks, null);
-                    result.then((response) => {
-                        console.log("insert Order : " + response);
+                    const result = orderDao_1.OrderDao.getInstance().insertOrderFromCart(newOrder, newBooks, null, () => {
+                        res.send("done");
                     });
                 }
             }, req.body.book_no);

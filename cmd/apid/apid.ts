@@ -142,7 +142,7 @@ if (apiVersion == "v1") {
   );
 
   server.addRule(
-    apiVersion + "/order",
+    apiVersion + "/orders/:MemberId",
     "GET",
     "Get Order list",
     "Order",

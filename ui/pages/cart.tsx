@@ -37,7 +37,7 @@ export const CartPage: React.FC<{}> = () => {
     let value = props.quantity;
     return (
       <div>
-        <div className="flex flex-row w-screen justify-around">
+        <div className="flex flex-row w-full justify-around">
           <div>도서 제목: {props.book.title}</div>
           <div>도서 저자: {props.book.author}</div>
           <div>도서 가격: {props.book.price}</div>
@@ -117,6 +117,7 @@ export const CartPage: React.FC<{}> = () => {
           totalPrice += arg.book.price * arg.quantity;
           return (
             <li key={arg.book.id + index}>
+              <hr />
               <BookItem
                 book={arg.book}
                 quantity={arg.quantity}
@@ -127,6 +128,7 @@ export const CartPage: React.FC<{}> = () => {
                   onClickDelete(value);
                 }}
               ></BookItem>
+              <hr />
             </li>
           );
         }
@@ -156,68 +158,74 @@ export const CartPage: React.FC<{}> = () => {
       axiosObj
         .get("http://localhost:4000/api/v1/cart/" + getCookie("member_no"))
         .then((res) => {
-          console.log(res.data[0].cart_no);
-          setCookie("cartNo", res.data[0].cart_no);
-          axiosObj
-            .get(
-              "http://localhost:4000/api/v1/cartDetail/" + res.data[0].cart_no
-            )
-            .then((response) => {
-              tempData = response.data;
-              let listLength = tempData.length;
-              if (listLength == 0) {
-                setIsLoading(false);
-              }
+          if (res.data[0] == undefined) {
+            alert("장바구니가 없습니다!");
+            router.push("/");
+          } else {
+            console.log(res.data[0].cart_no);
+            setCookie("cartNo", res.data[0].cart_no);
 
-              tempData.map((cartDetail) => {
-                console.log("may be cart?", cartDetail);
-                axiosObj
-                  .get(
-                    "http://localhost:4000/api/v1/books/" + cartDetail.book_no
-                  )
-                  .then((res) => {
-                    console.log("reading res", res.data);
+            axiosObj
+              .get(
+                "http://localhost:4000/api/v1/cartDetail/" + res.data[0].cart_no
+              )
+              .then((response) => {
+                tempData = response.data;
+                let listLength = tempData.length;
+                if (listLength == 0) {
+                  setIsLoading(false);
+                }
 
-                    let newBook: BookProps = {
-                      id: res.data.id,
-                      title: res.data.title,
-                      author: res.data.author,
-                      quantity: res.data.quantity,
-                      price: res.data.price,
-                    };
-                    let newCartData: CartProps = {
-                      book: newBook,
-                      quantity: cartDetail.cart_quantity,
-                    };
+                tempData.map((cartDetail) => {
+                  console.log("may be cart?", cartDetail);
+                  axiosObj
+                    .get(
+                      "http://localhost:4000/api/v1/books/" + cartDetail.book_no
+                    )
+                    .then((res) => {
+                      console.log("reading res", res.data);
 
-                    const list = data;
-                    list.push(newCartData);
+                      let newBook: BookProps = {
+                        id: res.data.id,
+                        title: res.data.title,
+                        author: res.data.author,
+                        quantity: res.data.quantity,
+                        price: res.data.price,
+                      };
+                      let newCartData: CartProps = {
+                        book: newBook,
+                        quantity: cartDetail.cart_quantity,
+                      };
 
-                    setData(list);
-                    setOriginData(list);
-                    listLength--;
-                  })
-                  .finally(() => {
-                    console.log("마지막에 실행?", data);
+                      const list = data;
+                      list.push(newCartData);
 
-                    if (listLength == 0 || listLength <= 0) {
-                      setIsLoading(false);
-                    }
-                  });
+                      setData(list);
+                      setOriginData(list);
+                      listLength--;
+                    })
+                    .finally(() => {
+                      console.log("마지막에 실행?", data);
+
+                      if (listLength == 0 || listLength <= 0) {
+                        setIsLoading(false);
+                      }
+                    });
+                });
               });
-            });
+          }
         });
     }
   }, []);
 
   return (
     <div>
-      장바구니
+      <span className="mt-10 ml-5 text-2xl">장바구니</span>
       <div>
         {isLoading ? (
           <>불러오는 중...</>
         ) : (
-          <div className="flex flex-col">
+          <div className="flex flex-col px-5">
             <BookList
               books={data}
               onListChange={(e) => {

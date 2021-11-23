@@ -48,7 +48,8 @@ export const OrderPage: React.FC<{}> = () => {
     let value = props.quantity;
     return (
       <div>
-        <div className="flex flex-row w-screen justify-around">
+        <hr />
+        <div className="flex flex-row w-full justify-around mt-1">
           <div>도서 제목: {props.book.title}</div>
           <div>도서 저자: {props.book.author}</div>
           <div>도서 가격: {props.book.price}</div>
@@ -147,7 +148,7 @@ export const OrderPage: React.FC<{}> = () => {
     return (
       <>
         <ul>{argumentList.length == 0 ? <></> : argumentList}</ul>
-        <div>주문 총액: {totalPrice}</div>
+        <div className="mt-3">주문 총액: {totalPrice}</div>
       </>
     );
   };
@@ -163,6 +164,7 @@ export const OrderPage: React.FC<{}> = () => {
         .get("http://localhost:4000/api/v1/cart/" + getCookie("member_no"))
         .then((res) => {
           console.log(res.data[0].cart_no);
+
           setCookie("cartNo", res.data[0].cart_no);
           axiosObj
             .get(
@@ -218,12 +220,12 @@ export const OrderPage: React.FC<{}> = () => {
 
   return (
     <div>
-      <div>주문</div>
-      <div>
+      <span className="mt-10 ml-5 text-2xl">주문</span>
+      <div className="mt-5">
         {isLoading ? (
           <>불러오는 중...</>
         ) : (
-          <div className="flex flex-col">
+          <div className="flex flex-col px-5">
             <BookList
               books={data}
               onListChange={(e) => {
@@ -235,7 +237,7 @@ export const OrderPage: React.FC<{}> = () => {
       </div>
       <div>
         <div className="flex flex-col justify-center">
-          <div>배송지 입력</div>
+          <span className="mt-10 ml-5 text-1xl font-bold">배송지 입력</span>
           <hr />
           <div className="flex ml-5 mt-5">
             <p>배송지 우편번호</p>
@@ -271,8 +273,8 @@ export const OrderPage: React.FC<{}> = () => {
             ></input>
           </div>
         </div>
-        <div>
-          <div>카드 정보 입력</div>
+        <div className="mt-5 mb-5">
+          <span className="mt-10 ml-5 text-1xl font-bold">카드 입력</span>
           <hr />
           <div className="flex ml-5 mt-5">
             <p>신용카드 종류</p>
@@ -296,7 +298,7 @@ export const OrderPage: React.FC<{}> = () => {
               }}
             ></input>
           </div>
-          <div className="flex ml-5 mt-5">
+          <div className="flex ml-5 mt-5 ">
             <p>신용카드 유효기간</p>
             <input
               type="text"
@@ -307,55 +309,58 @@ export const OrderPage: React.FC<{}> = () => {
               }}
             ></input>
           </div>
-          <Button
-            size="medium"
-            type="button"
-            color="gray"
-            isDisabled={false}
-            onClick={(ev) => {
-              ev.preventDefault();
+          <div className="ml-5 mt-5">
+            {" "}
+            <Button
+              size="medium"
+              type="button"
+              color="gray"
+              isDisabled={false}
+              onClick={(ev) => {
+                ev.preventDefault();
 
-              const axiosObj = axios.default;
+                const axiosObj = axios.default;
 
-              let data = {
-                cart_no: getCookie("cartNo"),
-                member_no: getCookie("member_no"),
-                credit_number: creditNumber,
-                credit_kind: creditKind,
-                credit_expiredate: creditExpiredate,
-                address_zipcode: zipcode,
-                address_address1: address1,
-                address_address2: address2,
-              };
+                let data = {
+                  cart_no: getCookie("cartNo"),
+                  member_no: getCookie("member_no"),
+                  credit_number: creditNumber,
+                  credit_kind: creditKind,
+                  credit_expiredate: creditExpiredate,
+                  address_zipcode: zipcode,
+                  address_address1: address1,
+                  address_address2: address2,
+                };
 
-              console.log("Sending...", data);
-              axiosObj
-                .post("http://localhost:4000/api/v1/order/", data, {
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                })
-                .then((res) => {
-                  router.push("/");
-                });
+                console.log("Sending...", data);
+                axiosObj
+                  .post("http://localhost:4000/api/v1/order/", data, {
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                  })
+                  .then((res) => {
+                    router.push("/");
+                  });
 
-              // if (data != originData) {
-              //   const listLength = data.length;
+                // if (data != originData) {
+                //   const listLength = data.length;
 
-              //   data.map((book, index) => {
-              //     const tempCart: CartDetailProps = {
-              //       cart_no: getCookie("cartNo"),
-              //       book_no: book.book.id,
-              //       cart_price: book.quantity * book.book.price,
-              //       cart_quantity: book.quantity,
-              //     };
-              //   });
-              // } else {
-              // }
-            }}
-          >
-            주문
-          </Button>
+                //   data.map((book, index) => {
+                //     const tempCart: CartDetailProps = {
+                //       cart_no: getCookie("cartNo"),
+                //       book_no: book.book.id,
+                //       cart_price: book.quantity * book.book.price,
+                //       cart_quantity: book.quantity,
+                //     };
+                //   });
+                // } else {
+                // }
+              }}
+            >
+              주문
+            </Button>
+          </div>
         </div>
       </div>
     </div>

@@ -19,7 +19,7 @@ class CartDetailController extends baseController_1.BaseController {
         return (req, res) => {
             // console.log("createNewCartDetail", req.body.memberNo);
             cartDao_1.CartDao.getInstance().getCartNoFromMemberNo((response) => {
-                // console.log("CART NO", response);
+                console.log("CART NO", response);
                 let newCart = {
                     cart_no: response.cart_no,
                     book_no: req.body.book_no,

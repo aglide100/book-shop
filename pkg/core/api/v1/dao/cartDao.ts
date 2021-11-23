@@ -69,7 +69,7 @@ export class CartDao extends BaseDao {
     });
   }
 
-  public getCartNoFromMemberNo(callback: Function, memberNo: string) {
+  public async getCartNoFromMemberNo(callback: Function, memberNo: string) {
     const q = `SELECT * FROM "Cart" WHERE member_no = $1`;
     var client = this.getClient();
 
@@ -79,7 +79,7 @@ export class CartDao extends BaseDao {
         return err;
       }
 
-      if (result.rows.length == 0) {
+      if (result.rows.length == 0 || result.rows[0] == undefined) {
         console.log("There is no Cart! creating new one....", memberNo);
         const newCartNo = uuid.v4();
         let cart: CartProps = {
@@ -87,9 +87,10 @@ export class CartDao extends BaseDao {
           member_no: memberNo,
           createdDate: "",
         };
-        this.insertNewCart(cart);
-
-        callback(newCartNo);
+        this.insertNewCart(cart).then((res) => {
+          console.log("creating.....", cart, res);
+          callback(cart);
+        });
       } else {
         callback(result.rows[0]);
       }
@@ -113,11 +114,18 @@ export class CartDao extends BaseDao {
       client.end();
 
       for (var i = 0; i < list.length; i++) {
-        let details: CartBookProps = {
+        console.log(
+          "before !!!!!!!!!!!!",
+          list[i].cart_no,
+          list[i].book_no,
+          list[i].cart_quantity,
+          list[i].cart_price
+        );
+        let details = {
           cart_no: list[i].cart_no,
           book_no: list[i].book_no,
-          cart_quantity: list[i].order_quantity,
-          cart_price: list[i].order_price,
+          cart_quantity: list[i].cart_quantity,
+          cart_price: list[i].cart_price,
         };
 
         data.push(details);
@@ -128,7 +136,7 @@ export class CartDao extends BaseDao {
     });
   }
 
-  public insertNewCart(cart: CartProps) {
+  public async insertNewCart(cart: CartProps) {
     const q = `INSERT INTO "Cart"(cart_no, member_no, create_date) values ($1, $2, NOW())`;
 
     console.log("InsertNewCart , ", cart);

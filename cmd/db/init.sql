@@ -44,7 +44,7 @@ create table if not exists "Order"
             on update cascade,
     credit_number     varchar not null,
     credit_kind       varchar not null,
-    credit_expiredate date    not null,
+    credit_expiredate varchar not null,
     address_zipcode   varchar not null,
     address_address1  varchar not null,
     address_address2  varchar
@@ -121,16 +121,8 @@ create unique index if not exists creditcard_card_number_uindex
 
 create table if not exists "Cart_Book"
 (
-    book_no       varchar not null
-        constraint cart_book_pk
-            primary key
-        constraint book_no
-            references "Book"
-            on update cascade on delete cascade,
-    cart_no       varchar not null
-        constraint cart_no
-            references "Cart"
-            on update cascade on delete cascade,
+    book_no       varchar not null,
+    cart_no       varchar not null,
     cart_quantity integer,
     cart_price    integer not null
 );
@@ -140,12 +132,8 @@ alter table "Cart_Book"
 
 create table if not exists "Order_detail"
 (
-    order_no       varchar
-        constraint order_no
-            references "Order",
-    book_no        varchar
-        constraint book_no
-            references "Book",
+    order_no       varchar,
+    book_no        varchar,
     order_quantity integer not null,
     order_price    integer not null
 );

@@ -28,7 +28,7 @@ export class CartDetailController extends BaseController {
       // console.log("createNewCartDetail", req.body.memberNo);
 
       CartDao.getInstance().getCartNoFromMemberNo((response: any) => {
-        // console.log("CART NO", response);
+        console.log("CART NO", response);
 
         let newCart: CartDetailProps = {
           cart_no: response.cart_no,

@@ -50,6 +50,10 @@ export default function Layout({
           |{" "}
           <Link href="/cart">
             <a>장바구니</a>
+          </Link>{" "}
+          |{" "}
+          <Link href="/orderlist">
+            <a>주문내역</a>
           </Link>
         </>
       );

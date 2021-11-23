@@ -55,7 +55,7 @@ if (apiVersion == "v1") {
     server.addRule(apiVersion + "/cart", "POST", "create cart", "Cart", CartCtrl.createNewCart());
     server.addRule(apiVersion + "/cart/:CartId", "DELETE", "delete cart", "Cart", CartCtrl.deleteCart());
     server.addRule(apiVersion + "/order", "POST", "Create new Order", "Order", OrderCtrl.createNewOrder());
-    server.addRule(apiVersion + "/order", "GET", "Get Order list", "Order", OrderCtrl.getAllOrder());
+    server.addRule(apiVersion + "/orders/:MemberId", "GET", "Get Order list", "Order", OrderCtrl.getAllOrder());
     server.addRule(apiVersion + "/order/:OrderId", "GET", "get Order detail", "Order", OrderCtrl.getOrderDetail());
     server.addRule(apiVersion + "/cartDetail/update", "POST", "Update order list", "Order", CartDetailCtrl.updateCartDetail());
     server.addRule(apiVersion + "/cartDetail", "POST", "insert new Cart_Book", "Cart_Book", CartDetailCtrl.createNewCartDetail());

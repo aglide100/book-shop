@@ -1,5 +1,5 @@
 import { BaseController } from "../../../controller/baseController";
-import { Handler, Request, Response } from "express";
+import { Handler, Request, response, Response } from "express";
 import * as uuid from "uuid";
 import { CartDao } from "../dao/cartDao";
 import { OrderDao } from "../dao/orderDao";
@@ -18,9 +18,15 @@ export class OrderController extends BaseController {
   public getAllOrder(): Handler {
     return (req: Request, res: Response) => {
       console.log("returns order list");
-      OrderDao.getInstance().selectOrderDetailFromNo((response: any) => {
+      OrderDao.getInstance().selectAllOrderFromMember((response: any) => {
         console.log(response);
+        res.send(response);
       }, req.params.MemberId);
+
+      // OrderDao.getInstance().selectOrderDetailFromNo((response: any) => {
+      //   console.log(response);
+      //   res.send(response)
+      // }, req.params.MemberId);
     };
   }
 
@@ -40,49 +46,51 @@ export class OrderController extends BaseController {
       CartDao.getInstance().selectCartFromNo((cart: any) => {
         if (cart != null) {
           console.log("Is it run? 1 cart", cart);
-          CartDao.getInstance().selectCartDetailFromNo(
-            (books: [CartBookProps]) => {
-              if (books.length > 0) {
-                var totalPrice = 0;
-                const id = uuid.v4();
+          CartDao.getInstance().selectCartDetailFromNo((books: any) => {
+            if (books.length > 0) {
+              var totalPrice = 0;
+              const id = uuid.v4();
 
-                for (var i = 0; i < books.length; i++) {
-                  totalPrice += books[i].cart_price;
-                  console.log("!!!!!!!!!!!!!!!!!", books[i]);
-                  let tempBooks: OrderDetailProps = {
-                    order_no: id,
-                    book_no: books[i].book_no,
-                    order_quantity: books[i].cart_quantity,
-                    order_price: books[i].cart_price,
-                  };
-                  newBooks.push(tempBooks);
-                }
-
-                let newOrder: OrderProps = {
+              for (var i = 0; i < books.length; i++) {
+                totalPrice += books[i].cart_price;
+                let tempBooks: OrderDetailProps = {
                   order_no: id,
-                  orderdate: "",
-                  price: totalPrice,
-                  member_no: cart.member_no,
-                  credit_number: req.body.credit_number,
-                  credit_kind: req.body.credit_kind,
-                  credit_expiredate: req.body.credit_expiredate,
-                  address_zipcode: req.body.address_zipcode,
-                  address_address1: req.body.address_address1,
-                  address_address2: req.body.address_address2,
+                  book_no: books[i].book_no,
+                  order_quantity: books[i].cart_quantity,
+                  order_price: books[i].cart_price,
                 };
-
-                const result = OrderDao.getInstance().insertOrderFromCart(
-                  newOrder,
-                  newBooks,
-                  cart.cart_no
-                );
-                console.log("insert Order : " + result);
-              } else {
-                // 북정보 없을때
+                newBooks.push(tempBooks);
               }
-            },
-            cart.cart_no
-          );
+
+              let newOrder: OrderProps = {
+                order_no: id,
+                orderdate: "",
+                price: totalPrice,
+                member_no: cart.member_no,
+                credit_number: req.body.credit_number,
+                credit_kind: req.body.credit_kind,
+                credit_expiredate: req.body.credit_expiredate,
+                address_zipcode: req.body.address_zipcode,
+                address_address1: req.body.address_address1,
+                address_address2: req.body.address_address2,
+              };
+
+              let result = OrderDao.getInstance().insertOrderFromCart(
+                newOrder,
+                newBooks,
+                cart.cart_no,
+                () => {
+                  res.send("done");
+                }
+              );
+
+              // result.finally(() => {
+              //   console.log("insert Order : 바깥");
+              // });
+            } else {
+              // 북정보 없을때
+            }
+          }, cart.cart_no);
         } else {
           // 카드 정보 없을때 처리
         }
@@ -119,14 +127,14 @@ export class OrderController extends BaseController {
             address_address2: req.body.address_address2,
           };
 
-          let result = OrderDao.getInstance().insertOrderFromCart(
+          const result = OrderDao.getInstance().insertOrderFromCart(
             newOrder,
             newBooks,
-            null
+            null,
+            () => {
+              res.send("done");
+            }
           );
-          result.then((response) => {
-            console.log("insert Order : " + response);
-          });
         }
       }, req.body.book_no);
     };

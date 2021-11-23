@@ -88,6 +88,7 @@ class CartDetailDao extends baseDao_1.BaseDao {
         // const q = `INSERT INTO "Cart_Book"(book_no, cart_no, cart_quantity, cart_price) values ($1, $2, $3, $4)`;
         const q = `INSERT INTO "Cart_Book" (book_no, cart_no, cart_quantity, cart_price) VALUES ($1, $2, $3, $4)`;
         var client = this.getClient();
+        console.log("InsertNewCartDetail", cartDetail);
         client.query(q, [
             cartDetail.book_no,
             cartDetail.cart_no,
@@ -95,7 +96,7 @@ class CartDetailDao extends baseDao_1.BaseDao {
             cartDetail.cart_price,
         ], (err, result) => {
             if (err) {
-                console.log("Can't exec query!" + err);
+                console.log("Can't exec query! in inserNewCartDetail" + err);
             }
             console.log(result);
             client.end();

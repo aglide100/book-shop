@@ -62,7 +62,7 @@ const BookList = () => {
     <>
       <AnimateSharedLayout>
         <div>
-          <span>검색 </span>
+          <span className="mt-10 ml-5 text-1xl mr-3">검색</span>
           <input
             type="text"
             className="w-80"

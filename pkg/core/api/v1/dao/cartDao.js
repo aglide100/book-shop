@@ -83,28 +83,32 @@ class CartDao extends baseDao_1.BaseDao {
         });
     }
     getCartNoFromMemberNo(callback, memberNo) {
-        const q = `SELECT * FROM "Cart" WHERE member_no = $1`;
-        var client = this.getClient();
-        client.query(q, [memberNo], (err, result) => {
-            if (err) {
-                console.log("Can't exec query!" + err);
-                return err;
-            }
-            if (result.rows.length == 0) {
-                console.log("There is no Cart! creating new one....", memberNo);
-                const newCartNo = uuid.v4();
-                let cart = {
-                    cart_no: newCartNo,
-                    member_no: memberNo,
-                    createdDate: "",
-                };
-                this.insertNewCart(cart);
-                callback(newCartNo);
-            }
-            else {
-                callback(result.rows[0]);
-            }
-            client.end();
+        return __awaiter(this, void 0, void 0, function* () {
+            const q = `SELECT * FROM "Cart" WHERE member_no = $1`;
+            var client = this.getClient();
+            client.query(q, [memberNo], (err, result) => {
+                if (err) {
+                    console.log("Can't exec query!" + err);
+                    return err;
+                }
+                if (result.rows.length == 0 || result.rows[0] == undefined) {
+                    console.log("There is no Cart! creating new one....", memberNo);
+                    const newCartNo = uuid.v4();
+                    let cart = {
+                        cart_no: newCartNo,
+                        member_no: memberNo,
+                        createdDate: "",
+                    };
+                    this.insertNewCart(cart).then((res) => {
+                        console.log("creating.....", cart, res);
+                        callback(cart);
+                    });
+                }
+                else {
+                    callback(result.rows[0]);
+                }
+                client.end();
+            });
         });
     }
     selectCartDetailFromNo(callback, no) {
@@ -119,11 +123,12 @@ class CartDao extends baseDao_1.BaseDao {
             // noinspection DuplicatedCode
             client.end();
             for (var i = 0; i < list.length; i++) {
+                console.log("before !!!!!!!!!!!!", list[i].cart_no, list[i].book_no, list[i].cart_quantity, list[i].cart_price);
                 let details = {
                     cart_no: list[i].cart_no,
                     book_no: list[i].book_no,
-                    cart_quantity: list[i].order_quantity,
-                    cart_price: list[i].order_price,
+                    cart_quantity: list[i].cart_quantity,
+                    cart_price: list[i].cart_price,
                 };
                 data.push(details);
             }
@@ -132,14 +137,16 @@ class CartDao extends baseDao_1.BaseDao {
         });
     }
     insertNewCart(cart) {
-        const q = `INSERT INTO "Cart"(cart_no, member_no, create_date) values ($1, $2, NOW())`;
-        console.log("InsertNewCart , ", cart);
-        var client = this.getClient();
-        client.query(q, [cart.cart_no, cart.member_no], (err, result) => {
-            if (err) {
-                console.log("Can't exec query! Insert New Cart" + err);
-            }
-            client.end();
+        return __awaiter(this, void 0, void 0, function* () {
+            const q = `INSERT INTO "Cart"(cart_no, member_no, create_date) values ($1, $2, NOW())`;
+            console.log("InsertNewCart , ", cart);
+            var client = this.getClient();
+            client.query(q, [cart.cart_no, cart.member_no], (err, result) => {
+                if (err) {
+                    console.log("Can't exec query! Insert New Cart" + err);
+                }
+                client.end();
+            });
         });
     }
     deleteCart(id) {
